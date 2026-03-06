@@ -193,16 +193,16 @@ Acceptance criteria:
 
 **Issue 14**
 
-Status: READY
+Status: COMPLETE
 
 Task: Implement `UI/Settings/SettingsView.swift` and all tab views per PRD Section 11.2 as a SwiftUI Settings scene. General tab: hotkey recorder (click-to-record new combo), hotkey mode picker (PTT/Toggle), launch at login toggle (via SMAppService), sound feedback toggle. ASR Engine tab: engine picker with download status per engine from ModelDownloadManager, download/delete buttons with progress bar. Post-Processing tab: Ollama/None picker, model name text field, host URL field, test connection button (stub action for now). Audio tab: input device picker from AudioDeviceManager, gain normalization toggle, target dBFS slider (-30 to -10), max recording duration stepper (5-60s), live mic level meter. History tab: on/off toggle, clear button, max items stepper. All values bind to AppConfig and persist. ASR engine or post-processor change triggers pipeline rebuild.
 
 Acceptance criteria:
-- [ ] `xcodebuild build` succeeds
-- [ ] Settings window opens from menu bar context menu
-- [ ] All five tabs render without crash
-- [ ] Config changes write to UserDefaults immediately
-- [ ] Changing ASR engine triggers model unload + reload
+- [x] `xcodebuild build` succeeds
+- [x] Settings window opens from menu bar context menu
+- [x] All five tabs render without crash
+- [x] Config changes write to UserDefaults immediately
+- [x] Changing ASR engine triggers model unload + reload
 
 
 **Issue 15**

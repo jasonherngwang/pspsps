@@ -1,4 +1,5 @@
 import AVFoundation
+import Combine
 import CoreGraphics
 import OSLog
 
@@ -20,20 +21,93 @@ final class AppCoordinator: ObservableObject {
     @Published private(set) var state: AppState = .idle
     @Published private(set) var lastTranscript: String = ""
 
+    /// Live-bound app configuration. Saving to UserDefaults on every change.
+    @Published var config: AppConfig = .current {
+        didSet { config.save() }
+    }
+
     let hotkeyManager = HotkeyManager()
     let audioCaptureManager = AudioCaptureManager()
     let textPaster = TextPaster()
+    let downloadManager = ModelDownloadManager()
     private(set) var pipeline: TranscriptionPipeline
 
     private let logger = Logger(subsystem: "com.pspsps.pspsps", category: "AppCoordinator")
+    private var cancellables: Set<AnyCancellable> = []
+
+    // Track previous values to detect meaningful config changes.
+    private var prevASREngine: AppConfig.ASREngineOption
+    private var prevPostProcessor: AppConfig.PostProcessorOption
+    private var prevHotkeyKeyCode: UInt16
+    private var prevHotkeyModifiers: UInt64
+    private var prevHotkeyMode: AppConfig.HotkeyMode
 
     init() {
-        pipeline = PipelineFactory.build()
+        let initialConfig = AppConfig.current
+        prevASREngine      = initialConfig.asrEngine
+        prevPostProcessor  = initialConfig.postProcessor
+        prevHotkeyKeyCode  = initialConfig.hotkeyKeyCode
+        prevHotkeyModifiers = initialConfig.hotkeyModifiers
+        prevHotkeyMode     = initialConfig.hotkeyMode
+
+        pipeline = PipelineFactory.build(from: initialConfig)
         setupCallbacks()
+        observeConfigChanges()
         Task { await self.startup() }
     }
 
+    // MARK: - Pipeline Rebuild
+
+    func rebuildPipeline() {
+        let oldEngine = pipeline.asrEngine
+        pipeline = PipelineFactory.build(from: config)
+        oldEngine.unloadModel()
+        Task {
+            do {
+                try await self.pipeline.asrEngine.loadModel()
+            } catch {
+                self.logger.error("Model reload failed: \(error)")
+            }
+        }
+    }
+
     // MARK: - Private
+
+    private func observeConfigChanges() {
+        $config
+            .dropFirst()
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] newConfig in
+                MainActor.assumeIsolated {
+                    self?.handleConfigChange(to: newConfig)
+                }
+            }
+            .store(in: &cancellables)
+    }
+
+    private func handleConfigChange(to newConfig: AppConfig) {
+        let needsPipelineRebuild =
+            newConfig.asrEngine != prevASREngine ||
+            newConfig.postProcessor != prevPostProcessor
+
+        let needsHotkeyRestart =
+            newConfig.hotkeyKeyCode != prevHotkeyKeyCode ||
+            newConfig.hotkeyModifiers != prevHotkeyModifiers ||
+            newConfig.hotkeyMode != prevHotkeyMode
+
+        prevASREngine      = newConfig.asrEngine
+        prevPostProcessor  = newConfig.postProcessor
+        prevHotkeyKeyCode  = newConfig.hotkeyKeyCode
+        prevHotkeyModifiers = newConfig.hotkeyModifiers
+        prevHotkeyMode     = newConfig.hotkeyMode
+
+        if needsPipelineRebuild {
+            rebuildPipeline()
+        }
+        if needsHotkeyRestart {
+            startHotkeyListening()
+        }
+    }
 
     private func startup() async {
         do {
@@ -45,7 +119,6 @@ final class AppCoordinator: ObservableObject {
     }
 
     private func startHotkeyListening() {
-        let config = AppConfig.current
         do {
             try hotkeyManager.startListening(
                 keyCode: config.hotkeyKeyCode,

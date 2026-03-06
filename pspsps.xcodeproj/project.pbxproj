@@ -40,6 +40,7 @@
 		AAAA000000000000000000E8 /* AppCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAAA000000000000000000E7 /* AppCoordinator.swift */; };
 		AAAA000000000000000000EA /* MenuBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAAA000000000000000000E9 /* MenuBarController.swift */; };
 		AAAA000000000000000000ED /* RecordingOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAAA000000000000000000EC /* RecordingOverlay.swift */; };
+		AAAA000000000000000000EF /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAAA000000000000000000EE /* SettingsView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -78,6 +79,7 @@
 		AAAA000000000000000000E7 /* AppCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppCoordinator.swift; sourceTree = "<group>"; };
 		AAAA000000000000000000E9 /* MenuBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarController.swift; sourceTree = "<group>"; };
 		AAAA000000000000000000EC /* RecordingOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordingOverlay.swift; sourceTree = "<group>"; };
+		AAAA000000000000000000EE /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -248,8 +250,17 @@
 			children = (
 				AAAA000000000000000000E9 /* MenuBarController.swift */,
 				AAAA000000000000000000EC /* RecordingOverlay.swift */,
+				AAAA000000000000000000F0 /* Settings */,
 			);
 			path = UI;
+			sourceTree = "<group>";
+		};
+		AAAA000000000000000000F0 /* Settings */ = {
+			isa = PBXGroup;
+			children = (
+				AAAA000000000000000000EE /* SettingsView.swift */,
+			);
+			path = Settings;
 			sourceTree = "<group>";
 		};
 		AAAA00000000000000000005 /* Products */ = {
@@ -408,6 +419,7 @@
 				AAAA000000000000000000E8 /* AppCoordinator.swift in Sources */,
 				AAAA000000000000000000EA /* MenuBarController.swift in Sources */,
 				AAAA000000000000000000ED /* RecordingOverlay.swift in Sources */,
+				AAAA000000000000000000EF /* SettingsView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
