@@ -164,21 +164,21 @@ Acceptance criteria:
 
 **Issue 12**
 
-Status: READY
+Status: COMPLETE
 
 Task: Implement `UI/MenuBarController.swift` per PRD Section 11.1. Create NSStatusItem with a microphone SF Symbol icon. Icon state machine synced to the app coordinator's state: idle (default color), recording (red tint or highlighted), processing/transcribing (activity indicator or alternate icon), error (warning badge overlay). Left-click opens a popover (placeholder for now). Right-click context menu with: Settings (opens Settings window), History (placeholder), Quit (NSApp.terminate). Remove any main window — app is menu-bar-only.
 
 Acceptance criteria:
-- [ ] `xcodebuild build` succeeds
-- [ ] App launches with no main window, only a menu bar status item
-- [ ] Status item icon changes based on state (idle, recording, processing, error)
-- [ ] Right-click context menu has Settings, History, and Quit items
-- [ ] Quit menu item terminates the app
+- [x] `xcodebuild build` succeeds
+- [x] App launches with no main window, only a menu bar status item
+- [x] Status item icon changes based on state (idle, recording, processing, error)
+- [x] Right-click context menu has Settings, History, and Quit items
+- [x] Quit menu item terminates the app
 
 
 **Issue 13**
 
-Status: BLOCKED by Issue 12
+Status: READY
 
 Task: Implement `UI/RecordingOverlay.swift` per PRD Section 11.3 as a floating NSPanel — `styleMask: [.nonactivatingPanel]`, `level: .floating`, `collectionBehavior: [.canJoinAllSpaces, .fullScreenAuxiliary]` (not in Dock, not in Mission Control). Show "Recording..." during PTT hold, "Transcribing..." during ASR, truncated result (first 40 chars) after paste. Auto-dismiss after `AppConfig.overlayDurationSeconds`. Position at bottom-center of active screen. Also implement the menu bar left-click popover showing the last transcript text and a "Copy" button to re-paste.
 
@@ -193,7 +193,7 @@ Acceptance criteria:
 
 **Issue 14**
 
-Status: BLOCKED by Issue 12
+Status: READY
 
 Task: Implement `UI/Settings/SettingsView.swift` and all tab views per PRD Section 11.2 as a SwiftUI Settings scene. General tab: hotkey recorder (click-to-record new combo), hotkey mode picker (PTT/Toggle), launch at login toggle (via SMAppService), sound feedback toggle. ASR Engine tab: engine picker with download status per engine from ModelDownloadManager, download/delete buttons with progress bar. Post-Processing tab: Ollama/None picker, model name text field, host URL field, test connection button (stub action for now). Audio tab: input device picker from AudioDeviceManager, gain normalization toggle, target dBFS slider (-30 to -10), max recording duration stepper (5-60s), live mic level meter. History tab: on/off toggle, clear button, max items stepper. All values bind to AppConfig and persist. ASR engine or post-processor change triggers pipeline rebuild.
 

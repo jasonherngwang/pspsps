@@ -16,8 +16,11 @@ struct pspspsApp: App {
 @MainActor
 final class AppDelegate: NSObject, NSApplicationDelegate {
     private var coordinator: AppCoordinator?
+    private var menuBarController: MenuBarController?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
-        coordinator = AppCoordinator()
+        let coord = AppCoordinator()
+        coordinator = coord
+        menuBarController = MenuBarController(coordinator: coord)
     }
 }
