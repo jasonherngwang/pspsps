@@ -43,6 +43,7 @@
 		AAAA000000000000000000EF /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAAA000000000000000000EE /* SettingsView.swift */; };
 		AAAA000000000000000000F2 /* OllamaPostProcessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAAA000000000000000000F1 /* OllamaPostProcessor.swift */; };
 		AAAA000000000000000000F4 /* OllamaPostProcessorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAAA000000000000000000F3 /* OllamaPostProcessorTests.swift */; };
+		AAAA000000000000000000F6 /* ParakeetEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAAA000000000000000000F5 /* ParakeetEngine.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -70,6 +71,7 @@
 		AAAA000000000000000000B0 /* AudioDeviceManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioDeviceManager.swift; sourceTree = "<group>"; };
 		AAAA000000000000000000C9 /* WhisperKitEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WhisperKitEngine.swift; sourceTree = "<group>"; };
 		AAAA000000000000000000CA /* ModelDownloadManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelDownloadManager.swift; sourceTree = "<group>"; };
+		AAAA000000000000000000F5 /* ParakeetEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ParakeetEngine.swift; sourceTree = "<group>"; };
 		AAAA000000000000000000CD /* test_speech.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = test_speech.wav; sourceTree = "<group>"; };
 		AAAA000000000000000000D1 /* WhisperKitIntegrationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WhisperKitIntegrationTests.swift; sourceTree = "<group>"; };
 		AAAA000000000000000000D3 /* HotkeyManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HotkeyManager.swift; sourceTree = "<group>"; };
@@ -238,6 +240,7 @@
 			children = (
 				AAAA000000000000000000C9 /* WhisperKitEngine.swift */,
 				AAAA000000000000000000CA /* ModelDownloadManager.swift */,
+				AAAA000000000000000000F5 /* ParakeetEngine.swift */,
 			);
 			path = ASR;
 			sourceTree = "<group>";
@@ -427,6 +430,7 @@
 				AAAA000000000000000000ED /* RecordingOverlay.swift in Sources */,
 				AAAA000000000000000000EF /* SettingsView.swift in Sources */,
 			AAAA000000000000000000F2 /* OllamaPostProcessor.swift in Sources */,
+				AAAA000000000000000000F6 /* ParakeetEngine.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

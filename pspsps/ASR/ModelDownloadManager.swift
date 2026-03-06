@@ -1,3 +1,4 @@
+import FluidAudio
 import Foundation
 import WhisperKit
 
@@ -40,8 +41,13 @@ class ModelDownloadManager: ObservableObject {
     }
 
     func downloadParakeet() async {
-        // Parakeet download not implemented yet (Issue 16)
-        parakeetState = .failed("Parakeet engine not yet available")
+        parakeetState = .downloading(progress: 0.0)
+        do {
+            _ = try await AsrModels.download(to: ParakeetEngine.modelDirectory)
+            parakeetState = .downloaded
+        } catch {
+            parakeetState = .failed(error.localizedDescription)
+        }
     }
 
     func isDownloaded(_ engine: AppConfig.ASREngineOption) -> Bool {
@@ -50,7 +56,7 @@ class ModelDownloadManager: ObservableObject {
             let dir = WhisperKitEngine.modelDirectory
             return (try? FileManager.default.contentsOfDirectory(atPath: dir.path))?.isEmpty == false
         case .parakeet:
-            return false
+            return AsrModels.modelsExist(at: ParakeetEngine.modelDirectory)
         }
     }
 
@@ -60,6 +66,7 @@ class ModelDownloadManager: ObservableObject {
             try? FileManager.default.removeItem(at: WhisperKitEngine.modelDirectory)
             whisperKitState = .notDownloaded
         case .parakeet:
+            try? FileManager.default.removeItem(at: ParakeetEngine.modelDirectory)
             parakeetState = .notDownloaded
         }
     }

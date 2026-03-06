@@ -9,8 +9,7 @@ struct PipelineFactory {
         case .whisperKit:
             asrEngine = WhisperKitEngine()
         case .parakeet:
-            // ParakeetEngine will be implemented in Issue 16
-            asrEngine = WhisperKitEngine()
+            asrEngine = ParakeetEngine()
         }
 
         let postProcessor: any PostProcessor

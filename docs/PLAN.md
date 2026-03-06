@@ -222,22 +222,22 @@ Acceptance criteria:
 
 **Issue 16**
 
-Status: READY
+Status: COMPLETE
 
 Task: Implement `ASR/ParakeetEngine.swift`. If FluidAudio SPM resolved in Issue 1: implement full engine per PRD Section 5.2 — `loadModel()` via `FluidAudioModel.load(variant:)`, `unloadModel()` nils the reference, `transcribe()` returns result with language "en". If FluidAudio did NOT resolve: implement a stub where `isAvailable` returns false, `loadModel()` throws `ASRError.engineUnavailable` with message "Parakeet engine not yet available", and `transcribe()` throws the same error. Add Parakeet state tracking to ModelDownloadManager (parakeetState property).
 
 Acceptance criteria:
-- [ ] `xcodebuild build` succeeds
-- [ ] ParakeetEngine conforms to ASREngine protocol
-- [ ] If FluidAudio available: loadModel and transcribe compile against real API
-- [ ] If FluidAudio unavailable: isAvailable returns false, loadModel throws descriptive error
-- [ ] ModelDownloadManager has parakeetState: ModelState property
-- [ ] unloadModel() sets internal model reference to nil
+- [x] `xcodebuild build` succeeds
+- [x] ParakeetEngine conforms to ASREngine protocol
+- [x] If FluidAudio available: loadModel and transcribe compile against real API
+- [x] If FluidAudio unavailable: isAvailable returns false, loadModel throws descriptive error
+- [x] ModelDownloadManager has parakeetState: ModelState property
+- [x] unloadModel() sets internal model reference to nil
 
 
 **Issue 17**
 
-Status: BLOCKED by Issue 16
+Status: READY
 
 Task: Implement `UI/Onboarding/ASRPickerView.swift` per PRD Section 10.1. Two engine cards: WhisperKit (pre-selected, "Recommended" badge, "~600 MB", "~0.45s latency", "Best for whispers, accents, noise") and Parakeet ("~480 MB", "~0.19s latency", "Best for clear speech, speed"). If Parakeet is unavailable (stub), show its card as disabled/grayed with "Coming soon". Single "Download & Continue" button triggers ModelDownloadManager download for the selected engine. Progress bar replaces button during download. Implement engine switching in ASR Settings tab: "Switch" button if already downloaded, unloads current model and loads new one. Menu bar spinner during switch.
 
