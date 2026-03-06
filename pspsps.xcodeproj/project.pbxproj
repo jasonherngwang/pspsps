@@ -49,6 +49,9 @@
 		AAAA000000000000000000FF /* TranscriptHistory.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAAA000000000000000000FB /* TranscriptHistory.swift */; };
 		AAAA00000000000000000100 /* HistoryPopoverView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAAA000000000000000000FC /* HistoryPopoverView.swift */; };
 		AAAA00000000000000000102 /* TranscriptHistoryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAAA00000000000000000101 /* TranscriptHistoryTests.swift */; };
+		AAAA00000000000000000104 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAAA00000000000000000103 /* OnboardingView.swift */; };
+		AAAA00000000000000000106 /* AccessibilityPermissionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAAA00000000000000000105 /* AccessibilityPermissionView.swift */; };
+		AAAA00000000000000000108 /* MicrophonePermissionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAAA00000000000000000107 /* MicrophonePermissionView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -96,6 +99,9 @@
 		AAAA000000000000000000FB /* TranscriptHistory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TranscriptHistory.swift; sourceTree = "<group>"; };
 		AAAA000000000000000000FC /* HistoryPopoverView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryPopoverView.swift; sourceTree = "<group>"; };
 		AAAA00000000000000000101 /* TranscriptHistoryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TranscriptHistoryTests.swift; sourceTree = "<group>"; };
+		AAAA00000000000000000103 /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
+		AAAA00000000000000000105 /* AccessibilityPermissionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccessibilityPermissionView.swift; sourceTree = "<group>"; };
+		AAAA00000000000000000107 /* MicrophonePermissionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MicrophonePermissionView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -291,6 +297,9 @@
 			isa = PBXGroup;
 			children = (
 				AAAA000000000000000000F8 /* ASRPickerView.swift */,
+				AAAA00000000000000000103 /* OnboardingView.swift */,
+				AAAA00000000000000000105 /* AccessibilityPermissionView.swift */,
+				AAAA00000000000000000107 /* MicrophonePermissionView.swift */,
 			);
 			path = Onboarding;
 			sourceTree = "<group>";
@@ -466,6 +475,9 @@
 				AAAA000000000000000000FE /* TranscriptEntry.swift in Sources */,
 				AAAA000000000000000000FF /* TranscriptHistory.swift in Sources */,
 				AAAA00000000000000000100 /* HistoryPopoverView.swift in Sources */,
+				AAAA00000000000000000104 /* OnboardingView.swift in Sources */,
+				AAAA00000000000000000106 /* AccessibilityPermissionView.swift in Sources */,
+				AAAA00000000000000000108 /* MicrophonePermissionView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

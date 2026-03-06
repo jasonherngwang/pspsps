@@ -267,23 +267,23 @@ Acceptance criteria:
 
 **Issue 19**
 
-Status: READY
+Status: COMPLETE
 
 Task: Implement full onboarding flow per PRD Section 10: `UI/Onboarding/OnboardingView.swift` orchestrates three steps. Step 1: ASRPickerView (from Issue 17) — must complete download before advancing. Step 2: `AccessibilityPermissionView.swift` — explain why Accessibility is needed, button to open System Settings (`Privacy & Security > Accessibility`), poll `AXIsProcessTrusted()` every 500ms, auto-advance when granted. Step 3: `MicrophonePermissionView.swift` — request microphone permission via `AVCaptureDevice.requestAccess(for: .audio)`, advance on grant. Store `hasCompletedOnboarding` in UserDefaults. Show onboarding on first launch only. On subsequent launches, skip directly to menu bar.
 
 Acceptance criteria:
-- [ ] `xcodebuild build` succeeds
-- [ ] Onboarding appears when hasCompletedOnboarding is false
-- [ ] Onboarding is skipped when hasCompletedOnboarding is true
-- [ ] Step 1 blocks advancement until model download completes
-- [ ] Step 2 polls AXIsProcessTrusted() on a timer and auto-advances
-- [ ] Step 3 requests microphone access and advances on grant
-- [ ] hasCompletedOnboarding set to true after final step
+- [x] `xcodebuild build` succeeds
+- [x] Onboarding appears when hasCompletedOnboarding is false
+- [x] Onboarding is skipped when hasCompletedOnboarding is true
+- [x] Step 1 blocks advancement until model download completes
+- [x] Step 2 polls AXIsProcessTrusted() on a timer and auto-advances
+- [x] Step 3 requests microphone access and advances on grant
+- [x] hasCompletedOnboarding set to true after final step
 
 
 **Issue 20**
 
-Status: BLOCKED by Issue 19
+Status: READY
 
 Task: Implement all remaining error handling from PRD Section 13. Intel architecture check on launch: if `ProcessInfo.processInfo.processorArchitecture` is not arm64 (check `#if !arch(arm64)`), show alert "pspsps requires Apple Silicon (M1 or later)" and call `NSApp.terminate(nil)`. Empty transcription: show "Nothing detected" overlay toast, do not call TextPaster. Paste failure: write to clipboard, show "Copied to clipboard" toast. Audio device disconnect: stop recording, notify via overlay, fall back to system default. Model not loaded: menu bar warning badge, notification with download action. Accessibility not granted: menu bar lock icon, click opens onboarding. Microphone denied: notification with System Settings deeplink. Max duration exceeded: auto-stop with "Max duration reached" toast. Ollama model not found: notification, fall back to Passthrough. Add sound feedback: play system sounds on recording start/stop when `AppConfig.soundFeedbackEnabled` is true. Run full test suite to verify no regressions.
 
