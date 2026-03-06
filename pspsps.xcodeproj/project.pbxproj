@@ -11,6 +11,15 @@
 		AAAA00000000000000000051 /* pspspsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAAA00000000000000000020 /* pspspsTests.swift */; };
 		AAAA00000000000000000052 /* WhisperKit in Frameworks */ = {isa = PBXBuildFile; productRef = AAAA00000000000000000081 /* WhisperKit */; };
 		AAAA00000000000000000053 /* FluidAudio in Frameworks */ = {isa = PBXBuildFile; productRef = AAAA00000000000000000083 /* FluidAudio */; };
+		AAAA000000000000000000B1 /* ASREngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAAA000000000000000000A1 /* ASREngine.swift */; };
+		AAAA000000000000000000B2 /* PostProcessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAAA000000000000000000A2 /* PostProcessor.swift */; };
+		AAAA000000000000000000B3 /* AudioInputSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAAA000000000000000000A3 /* AudioInputSource.swift */; };
+		AAAA000000000000000000B4 /* TranscriptionResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAAA000000000000000000A4 /* TranscriptionResult.swift */; };
+		AAAA000000000000000000B5 /* PostProcessContext.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAAA000000000000000000A5 /* PostProcessContext.swift */; };
+		AAAA000000000000000000B6 /* ASRError.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAAA000000000000000000A6 /* ASRError.swift */; };
+		AAAA000000000000000000B7 /* PostProcessError.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAAA000000000000000000A7 /* PostProcessError.swift */; };
+		AAAA000000000000000000B8 /* PassthroughPostProcessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAAA000000000000000000A8 /* PassthroughPostProcessor.swift */; };
+		AAAA000000000000000000B9 /* MockASREngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAAA000000000000000000A9 /* MockASREngine.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -20,6 +29,15 @@
 		AAAA00000000000000000013 /* pspsps.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = pspsps.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		AAAA00000000000000000020 /* pspspsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = pspspsTests.swift; sourceTree = "<group>"; };
 		AAAA00000000000000000021 /* pspspsTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = pspspsTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		AAAA000000000000000000A1 /* ASREngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ASREngine.swift; sourceTree = "<group>"; };
+		AAAA000000000000000000A2 /* PostProcessor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostProcessor.swift; sourceTree = "<group>"; };
+		AAAA000000000000000000A3 /* AudioInputSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioInputSource.swift; sourceTree = "<group>"; };
+		AAAA000000000000000000A4 /* TranscriptionResult.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TranscriptionResult.swift; sourceTree = "<group>"; };
+		AAAA000000000000000000A5 /* PostProcessContext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostProcessContext.swift; sourceTree = "<group>"; };
+		AAAA000000000000000000A6 /* ASRError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ASRError.swift; sourceTree = "<group>"; };
+		AAAA000000000000000000A7 /* PostProcessError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostProcessError.swift; sourceTree = "<group>"; };
+		AAAA000000000000000000A8 /* PassthroughPostProcessor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PassthroughPostProcessor.swift; sourceTree = "<group>"; };
+		AAAA000000000000000000A9 /* MockASREngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockASREngine.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -57,6 +75,8 @@
 				AAAA00000000000000000010 /* pspspsApp.swift */,
 				AAAA00000000000000000011 /* pspsps.entitlements */,
 				AAAA00000000000000000012 /* Info.plist */,
+				AAAA000000000000000000C1 /* Core */,
+				AAAA000000000000000000C4 /* PostProcessors */,
 			);
 			path = pspsps;
 			sourceTree = "<group>";
@@ -65,8 +85,55 @@
 			isa = PBXGroup;
 			children = (
 				AAAA00000000000000000020 /* pspspsTests.swift */,
+				AAAA000000000000000000C5 /* Mocks */,
 			);
 			path = pspspsTests;
+			sourceTree = "<group>";
+		};
+		AAAA000000000000000000C1 /* Core */ = {
+			isa = PBXGroup;
+			children = (
+				AAAA000000000000000000C2 /* Protocols */,
+				AAAA000000000000000000C3 /* Models */,
+			);
+			path = Core;
+			sourceTree = "<group>";
+		};
+		AAAA000000000000000000C2 /* Protocols */ = {
+			isa = PBXGroup;
+			children = (
+				AAAA000000000000000000A1 /* ASREngine.swift */,
+				AAAA000000000000000000A2 /* PostProcessor.swift */,
+				AAAA000000000000000000A3 /* AudioInputSource.swift */,
+			);
+			path = Protocols;
+			sourceTree = "<group>";
+		};
+		AAAA000000000000000000C3 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				AAAA000000000000000000A4 /* TranscriptionResult.swift */,
+				AAAA000000000000000000A5 /* PostProcessContext.swift */,
+				AAAA000000000000000000A6 /* ASRError.swift */,
+				AAAA000000000000000000A7 /* PostProcessError.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		AAAA000000000000000000C4 /* PostProcessors */ = {
+			isa = PBXGroup;
+			children = (
+				AAAA000000000000000000A8 /* PassthroughPostProcessor.swift */,
+			);
+			path = PostProcessors;
+			sourceTree = "<group>";
+		};
+		AAAA000000000000000000C5 /* Mocks */ = {
+			isa = PBXGroup;
+			children = (
+				AAAA000000000000000000A9 /* MockASREngine.swift */,
+			);
+			path = Mocks;
 			sourceTree = "<group>";
 		};
 		AAAA00000000000000000005 /* Products */ = {
@@ -195,6 +262,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				AAAA00000000000000000050 /* pspspsApp.swift in Sources */,
+				AAAA000000000000000000B1 /* ASREngine.swift in Sources */,
+				AAAA000000000000000000B2 /* PostProcessor.swift in Sources */,
+				AAAA000000000000000000B3 /* AudioInputSource.swift in Sources */,
+				AAAA000000000000000000B4 /* TranscriptionResult.swift in Sources */,
+				AAAA000000000000000000B5 /* PostProcessContext.swift in Sources */,
+				AAAA000000000000000000B6 /* ASRError.swift in Sources */,
+				AAAA000000000000000000B7 /* PostProcessError.swift in Sources */,
+				AAAA000000000000000000B8 /* PassthroughPostProcessor.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -203,6 +278,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				AAAA00000000000000000051 /* pspspsTests.swift in Sources */,
+				AAAA000000000000000000B9 /* MockASREngine.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

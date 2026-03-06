@@ -22,22 +22,22 @@ Acceptance criteria:
 
 **Issue 2**
 
-Status: READY
+Status: COMPLETE
 
 Task: Create all protocol definitions and data models per PRD Sections 4.2 and 4.3. Files: `Core/Protocols/ASREngine.swift`, `Core/Protocols/PostProcessor.swift`, `Core/Protocols/AudioInputSource.swift`, `Core/Models/TranscriptionResult.swift`, `Core/Models/PostProcessContext.swift`. Create error types `ASRError` and `PostProcessError` (model not loaded, engine unavailable, transcription failed, post-processing failed). Create `PostProcessors/PassthroughPostProcessor.swift`. In the test target, create `Mocks/MockASREngine.swift` with configurable mock result.
 
 Acceptance criteria:
-- [ ] `xcodebuild build` succeeds
-- [ ] ASREngine protocol has: name, isAvailable, loadModel() async throws, unloadModel(), transcribe(audio:) async throws -> TranscriptionResult
-- [ ] PostProcessor protocol has: name, isAvailable, clean(transcript:context:) async throws -> String
-- [ ] AudioInputSource protocol has: name, deviceID, startCapture() throws, stopCapture() -> AVAudioPCMBuffer
-- [ ] PassthroughPostProcessor.clean() returns input text unchanged
-- [ ] MockASREngine.transcribe() returns its configured mockResult string
+- [x] `xcodebuild build` succeeds
+- [x] ASREngine protocol has: name, isAvailable, loadModel() async throws, unloadModel(), transcribe(audio:) async throws -> TranscriptionResult
+- [x] PostProcessor protocol has: name, isAvailable, clean(transcript:context:) async throws -> String
+- [x] AudioInputSource protocol has: name, deviceID, startCapture() throws, stopCapture() -> AVAudioPCMBuffer
+- [x] PassthroughPostProcessor.clean() returns input text unchanged
+- [x] MockASREngine.transcribe() returns its configured mockResult string
 
 
 **Issue 3**
 
-Status: BLOCKED by Issue 2
+Status: READY
 
 Task: Implement `AppConfig` struct per PRD Section 9.1 with all fields and nested enums (`ASREngineOption`, `PostProcessorOption`, `HotkeyMode`). Implement UserDefaults persistence — encode entire struct as JSON data, store under a single key, decode on read. Provide a `static var current` accessor that loads from UserDefaults (or returns defaults). Write unit tests for encode/decode roundtrip.
 
@@ -50,7 +50,7 @@ Acceptance criteria:
 
 **Issue 4**
 
-Status: BLOCKED by Issue 2
+Status: READY
 
 Task: Implement `Audio/AudioProcessor.swift` with `normalizeRMS(_:targetDBFS:)` per PRD Section 7.2. Allocate a new output buffer manually (do NOT use `.copy()` — AVAudioPCMBuffer does not conform to NSCopying). In the test target, create `Helpers/SyntheticAudio.swift` with `makeSineBuffer(frequency:amplitude:duration:sampleRate:)` and `makeSilenceBuffer(duration:sampleRate:)` per PRD Section 18.2. Write unit tests.
 
@@ -107,7 +107,7 @@ Acceptance criteria:
 
 **Issue 8**
 
-Status: BLOCKED by Issue 2
+Status: READY
 
 Task: Implement `Input/HotkeyManager.swift` per PRD Section 8.1. Register a CGEvent tap for keyDown + keyUp events. Match against configured keyCode and modifiers. Consume matched events by returning nil from the tap callback (prevent foreground app from receiving the hotkey). Support two modes: push-to-talk (keyDown = start, keyUp = stop) and toggle (keyDown = toggle). Check `AXIsProcessTrusted()` before attempting registration — expose a method to check permission status. Expose a callback/closure `onHotkeyEvent: (HotkeyEvent) -> Void` where HotkeyEvent is `.started` or `.stopped`.
 
