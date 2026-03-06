@@ -37,15 +37,15 @@ Acceptance criteria:
 
 **Issue 3**
 
-Status: READY
+Status: COMPLETE
 
 Task: Implement `AppConfig` struct per PRD Section 9.1 with all fields and nested enums (`ASREngineOption`, `PostProcessorOption`, `HotkeyMode`). Implement UserDefaults persistence — encode entire struct as JSON data, store under a single key, decode on read. Provide a `static var current` accessor that loads from UserDefaults (or returns defaults). Write unit tests for encode/decode roundtrip.
 
 Acceptance criteria:
-- [ ] `xcodebuild test` passes: AppConfig with non-default values encodes to UserDefaults and decodes back with all fields matching
-- [ ] All default values match PRD Section 9.1 (e.g. hotkeyKeyCode = 49, gainTargetDBFS = -20, maxRecordingDurationSeconds = 30, ollamaModel = "qwen3.5:4b")
-- [ ] All three enums are Codable and CaseIterable
-- [ ] `xcodebuild build` succeeds
+- [x] `xcodebuild test` passes: AppConfig with non-default values encodes to UserDefaults and decodes back with all fields matching
+- [x] All default values match PRD Section 9.1 (e.g. hotkeyKeyCode = 49, gainTargetDBFS = -20, maxRecordingDurationSeconds = 30, ollamaModel = "qwen3.5:4b")
+- [x] All three enums are Codable and CaseIterable
+- [x] `xcodebuild build` succeeds
 
 
 **Issue 4**
@@ -79,7 +79,7 @@ Acceptance criteria:
 
 **Issue 6**
 
-Status: BLOCKED by Issue 3
+Status: READY
 
 Task: Implement `ASR/WhisperKitEngine.swift` conforming to `ASREngine` per PRD Section 5.1. Use WhisperKit's built-in model management — `loadModel()` calls WhisperKit init which downloads if needed. `unloadModel()` nils the reference. `transcribe()` uses `wk.transcribe(audioArray:)` — note that `toFloatArray()` is a WhisperKit extension on AVAudioPCMBuffer. Implement `ASR/ModelDownloadManager.swift` as `@MainActor ObservableObject` per PRD Section 5.3 — track `ModelState` enum (notDownloaded, downloading(progress), downloaded, failed). For WhisperKit, wrap its download API to expose progress. No separate `whisperKitProgress` property — progress lives inside the enum case.
 
@@ -122,7 +122,7 @@ Acceptance criteria:
 
 **Issue 9**
 
-Status: BLOCKED by Issue 3
+Status: READY
 
 Task: Implement `Input/TextPaster.swift` per PRD Section 8.2. Save current pasteboard string, write new text, synthesize Cmd+V via CGEvent (virtual key 0x09 with .maskCommand), restore previous pasteboard after configurable delay (`AppConfig.pasteboardRestoreDelaySeconds`, default 0.3s). Write unit test verifying pasteboard write and restore behavior.
 
@@ -252,7 +252,7 @@ Acceptance criteria:
 
 **Issue 18**
 
-Status: BLOCKED by Issue 3
+Status: READY
 
 Task: Implement `History/TranscriptEntry.swift` (Codable struct: id UUID, text, timestamp Date, sourceApp String?, sourceAppBundleID String?) and `History/TranscriptHistory.swift` (persist as JSON array to `~/Library/Application Support/pspsps/history.json`). Provide: `add(entry:)` (prepend, trim to maxHistoryItems), `delete(id:)`, `search(query:) -> [TranscriptEntry]` (case-insensitive substring match on text), `clear()`, `var entries: [TranscriptEntry]`. Create Application Support directory if needed. Load on init, save after mutations. Implement history UI as NSPopover content from menu bar: list with timestamp + preview, click to re-paste via TextPaster, swipe-to-delete, search field. Wire "History" menu item to show this popover. Write unit tests.
 

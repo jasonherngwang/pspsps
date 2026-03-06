@@ -20,6 +20,8 @@
 		AAAA000000000000000000B7 /* PostProcessError.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAAA000000000000000000A7 /* PostProcessError.swift */; };
 		AAAA000000000000000000B8 /* PassthroughPostProcessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAAA000000000000000000A8 /* PassthroughPostProcessor.swift */; };
 		AAAA000000000000000000B9 /* MockASREngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAAA000000000000000000A9 /* MockASREngine.swift */; };
+		AAAA000000000000000000BA /* AppConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAAA000000000000000000AA /* AppConfig.swift */; };
+		AAAA000000000000000000BB /* AppConfigTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAAA000000000000000000AB /* AppConfigTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -38,6 +40,8 @@
 		AAAA000000000000000000A7 /* PostProcessError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostProcessError.swift; sourceTree = "<group>"; };
 		AAAA000000000000000000A8 /* PassthroughPostProcessor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PassthroughPostProcessor.swift; sourceTree = "<group>"; };
 		AAAA000000000000000000A9 /* MockASREngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockASREngine.swift; sourceTree = "<group>"; };
+		AAAA000000000000000000AA /* AppConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppConfig.swift; sourceTree = "<group>"; };
+		AAAA000000000000000000AB /* AppConfigTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppConfigTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -73,6 +77,7 @@
 			isa = PBXGroup;
 			children = (
 				AAAA00000000000000000010 /* pspspsApp.swift */,
+				AAAA000000000000000000AA /* AppConfig.swift */,
 				AAAA00000000000000000011 /* pspsps.entitlements */,
 				AAAA00000000000000000012 /* Info.plist */,
 				AAAA000000000000000000C1 /* Core */,
@@ -85,6 +90,7 @@
 			isa = PBXGroup;
 			children = (
 				AAAA00000000000000000020 /* pspspsTests.swift */,
+				AAAA000000000000000000AB /* AppConfigTests.swift */,
 				AAAA000000000000000000C5 /* Mocks */,
 			);
 			path = pspspsTests;
@@ -262,6 +268,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				AAAA00000000000000000050 /* pspspsApp.swift in Sources */,
+				AAAA000000000000000000BA /* AppConfig.swift in Sources */,
 				AAAA000000000000000000B1 /* ASREngine.swift in Sources */,
 				AAAA000000000000000000B2 /* PostProcessor.swift in Sources */,
 				AAAA000000000000000000B3 /* AudioInputSource.swift in Sources */,
@@ -279,6 +286,7 @@
 			files = (
 				AAAA00000000000000000051 /* pspspsTests.swift in Sources */,
 				AAAA000000000000000000B9 /* MockASREngine.swift in Sources */,
+				AAAA000000000000000000BB /* AppConfigTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
