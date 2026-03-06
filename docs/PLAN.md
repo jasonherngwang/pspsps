@@ -79,22 +79,22 @@ Acceptance criteria:
 
 **Issue 6**
 
-Status: READY
+Status: COMPLETE
 
 Task: Implement `ASR/WhisperKitEngine.swift` conforming to `ASREngine` per PRD Section 5.1. Use WhisperKit's built-in model management — `loadModel()` calls WhisperKit init which downloads if needed. `unloadModel()` nils the reference. `transcribe()` uses `wk.transcribe(audioArray:)` — note that `toFloatArray()` is a WhisperKit extension on AVAudioPCMBuffer. Implement `ASR/ModelDownloadManager.swift` as `@MainActor ObservableObject` per PRD Section 5.3 — track `ModelState` enum (notDownloaded, downloading(progress), downloaded, failed). For WhisperKit, wrap its download API to expose progress. No separate `whisperKitProgress` property — progress lives inside the enum case.
 
 Acceptance criteria:
-- [ ] `xcodebuild build` succeeds
-- [ ] WhisperKitEngine conforms to ASREngine with all required methods
-- [ ] unloadModel() sets internal WhisperKit reference to nil
-- [ ] ModelDownloadManager is @MainActor and ObservableObject
-- [ ] ModelDownloadManager.ModelState enum has exactly: notDownloaded, downloading(progress: Double), downloaded, failed(String)
-- [ ] No redundant progress properties outside the enum
+- [x] `xcodebuild build` succeeds
+- [x] WhisperKitEngine conforms to ASREngine with all required methods
+- [x] unloadModel() sets internal WhisperKit reference to nil
+- [x] ModelDownloadManager is @MainActor and ObservableObject
+- [x] ModelDownloadManager.ModelState enum has exactly: notDownloaded, downloading(progress: Double), downloaded, failed(String)
+- [x] No redundant progress properties outside the enum
 
 
 **Issue 7**
 
-Status: BLOCKED by Issue 6
+Status: READY
 
 Task: Generate a test audio fixture using macOS TTS per PRD Section 18.1. Run: `say -o <path>/test_speech.aiff "The quick brown fox jumps over the lazy dog"` then `afconvert <path>/test_speech.aiff -f WAVE -d LEI16@16000 -c 1 <path>/test_speech.wav` and remove the .aiff. Place the .wav in a `TestFixtures/` directory accessible to the test target. Write an integration test that loads the WhisperKit model and transcribes the test audio. The first run will download the model (~600 MB) — use a generous test timeout (300+ seconds).
 
@@ -222,7 +222,7 @@ Acceptance criteria:
 
 **Issue 16**
 
-Status: BLOCKED by Issue 6
+Status: READY
 
 Task: Implement `ASR/ParakeetEngine.swift`. If FluidAudio SPM resolved in Issue 1: implement full engine per PRD Section 5.2 — `loadModel()` via `FluidAudioModel.load(variant:)`, `unloadModel()` nils the reference, `transcribe()` returns result with language "en". If FluidAudio did NOT resolve: implement a stub where `isAvailable` returns false, `loadModel()` throws `ASRError.engineUnavailable` with message "Parakeet engine not yet available", and `transcribe()` throws the same error. Add Parakeet state tracking to ModelDownloadManager (parakeetState property).
 
