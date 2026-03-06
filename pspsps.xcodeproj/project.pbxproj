@@ -22,6 +22,9 @@
 		AAAA000000000000000000B9 /* MockASREngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAAA000000000000000000A9 /* MockASREngine.swift */; };
 		AAAA000000000000000000BA /* AppConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAAA000000000000000000AA /* AppConfig.swift */; };
 		AAAA000000000000000000BB /* AppConfigTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAAA000000000000000000AB /* AppConfigTests.swift */; };
+		AAAA000000000000000000BC /* AudioProcessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAAA000000000000000000AC /* AudioProcessor.swift */; };
+		AAAA000000000000000000BD /* SyntheticAudio.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAAA000000000000000000AD /* SyntheticAudio.swift */; };
+		AAAA000000000000000000BE /* AudioProcessorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAAA000000000000000000AE /* AudioProcessorTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -42,6 +45,9 @@
 		AAAA000000000000000000A9 /* MockASREngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockASREngine.swift; sourceTree = "<group>"; };
 		AAAA000000000000000000AA /* AppConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppConfig.swift; sourceTree = "<group>"; };
 		AAAA000000000000000000AB /* AppConfigTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppConfigTests.swift; sourceTree = "<group>"; };
+		AAAA000000000000000000AC /* AudioProcessor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioProcessor.swift; sourceTree = "<group>"; };
+		AAAA000000000000000000AD /* SyntheticAudio.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyntheticAudio.swift; sourceTree = "<group>"; };
+		AAAA000000000000000000AE /* AudioProcessorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioProcessorTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -82,6 +88,7 @@
 				AAAA00000000000000000012 /* Info.plist */,
 				AAAA000000000000000000C1 /* Core */,
 				AAAA000000000000000000C4 /* PostProcessors */,
+				AAAA000000000000000000C6 /* Audio */,
 			);
 			path = pspsps;
 			sourceTree = "<group>";
@@ -91,7 +98,9 @@
 			children = (
 				AAAA00000000000000000020 /* pspspsTests.swift */,
 				AAAA000000000000000000AB /* AppConfigTests.swift */,
+				AAAA000000000000000000AE /* AudioProcessorTests.swift */,
 				AAAA000000000000000000C5 /* Mocks */,
+				AAAA000000000000000000C7 /* Helpers */,
 			);
 			path = pspspsTests;
 			sourceTree = "<group>";
@@ -140,6 +149,22 @@
 				AAAA000000000000000000A9 /* MockASREngine.swift */,
 			);
 			path = Mocks;
+			sourceTree = "<group>";
+		};
+		AAAA000000000000000000C6 /* Audio */ = {
+			isa = PBXGroup;
+			children = (
+				AAAA000000000000000000AC /* AudioProcessor.swift */,
+			);
+			path = Audio;
+			sourceTree = "<group>";
+		};
+		AAAA000000000000000000C7 /* Helpers */ = {
+			isa = PBXGroup;
+			children = (
+				AAAA000000000000000000AD /* SyntheticAudio.swift */,
+			);
+			path = Helpers;
 			sourceTree = "<group>";
 		};
 		AAAA00000000000000000005 /* Products */ = {
@@ -277,6 +302,7 @@
 				AAAA000000000000000000B6 /* ASRError.swift in Sources */,
 				AAAA000000000000000000B7 /* PostProcessError.swift in Sources */,
 				AAAA000000000000000000B8 /* PassthroughPostProcessor.swift in Sources */,
+				AAAA000000000000000000BC /* AudioProcessor.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -287,6 +313,8 @@
 				AAAA00000000000000000051 /* pspspsTests.swift in Sources */,
 				AAAA000000000000000000B9 /* MockASREngine.swift in Sources */,
 				AAAA000000000000000000BB /* AppConfigTests.swift in Sources */,
+				AAAA000000000000000000BD /* SyntheticAudio.swift in Sources */,
+				AAAA000000000000000000BE /* AudioProcessorTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

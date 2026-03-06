@@ -50,21 +50,21 @@ Acceptance criteria:
 
 **Issue 4**
 
-Status: READY
+Status: COMPLETE
 
 Task: Implement `Audio/AudioProcessor.swift` with `normalizeRMS(_:targetDBFS:)` per PRD Section 7.2. Allocate a new output buffer manually (do NOT use `.copy()` — AVAudioPCMBuffer does not conform to NSCopying). In the test target, create `Helpers/SyntheticAudio.swift` with `makeSineBuffer(frequency:amplitude:duration:sampleRate:)` and `makeSilenceBuffer(duration:sampleRate:)` per PRD Section 18.2. Write unit tests.
 
 Acceptance criteria:
-- [ ] `xcodebuild test` passes: sine buffer at -40 dBFS normalizes to -20 dBFS (within +/- 1 dB)
-- [ ] `xcodebuild test` passes: silence buffer (all zeros) returns buffer unchanged (no NaN, no crash)
-- [ ] `xcodebuild test` passes: gain clamps at +26 dB max (buffer at -50 dBFS does not exceed clamp)
-- [ ] `xcodebuild test` passes: output buffer has same format and frame count as input
-- [ ] Output buffer is a new allocation, not a reference to the input buffer
+- [x] `xcodebuild test` passes: sine buffer at -40 dBFS normalizes to -20 dBFS (within +/- 1 dB)
+- [x] `xcodebuild test` passes: silence buffer (all zeros) returns buffer unchanged (no NaN, no crash)
+- [x] `xcodebuild test` passes: gain clamps at +26 dB max (buffer at -50 dBFS does not exceed clamp)
+- [x] `xcodebuild test` passes: output buffer has same format and frame count as input
+- [x] Output buffer is a new allocation, not a reference to the input buffer
 
 
 **Issue 5**
 
-Status: BLOCKED by Issue 4
+Status: READY
 
 Task: Implement `Audio/AudioCaptureManager.swift` wrapping AVAudioEngine, conforming to `AudioInputSource`. On `startCapture()`, start the engine and install a tap on the input node — accumulate buffers internally in an array. On `stopCapture()`, remove the tap, stop the engine, concatenate all accumulated buffers into a single `AVAudioPCMBuffer`, and return it. Output format: 16kHz mono Float32. Implement max recording duration per PRD Section 7.1 — schedule a timer that auto-calls `stopCapture()` after `AppConfig.maxRecordingDurationSeconds`. Implement `Audio/AudioDeviceManager.swift` for CoreAudio device enumeration (list available input devices, select by UID, fall back to system default).
 
