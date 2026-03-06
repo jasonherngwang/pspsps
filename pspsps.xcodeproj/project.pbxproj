@@ -41,6 +41,8 @@
 		AAAA000000000000000000EA /* MenuBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAAA000000000000000000E9 /* MenuBarController.swift */; };
 		AAAA000000000000000000ED /* RecordingOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAAA000000000000000000EC /* RecordingOverlay.swift */; };
 		AAAA000000000000000000EF /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAAA000000000000000000EE /* SettingsView.swift */; };
+		AAAA000000000000000000F2 /* OllamaPostProcessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAAA000000000000000000F1 /* OllamaPostProcessor.swift */; };
+		AAAA000000000000000000F4 /* OllamaPostProcessorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAAA000000000000000000F3 /* OllamaPostProcessorTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -80,6 +82,8 @@
 		AAAA000000000000000000E9 /* MenuBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarController.swift; sourceTree = "<group>"; };
 		AAAA000000000000000000EC /* RecordingOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordingOverlay.swift; sourceTree = "<group>"; };
 		AAAA000000000000000000EE /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		AAAA000000000000000000F1 /* OllamaPostProcessor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OllamaPostProcessor.swift; sourceTree = "<group>"; };
+		AAAA000000000000000000F3 /* OllamaPostProcessorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OllamaPostProcessorTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -138,6 +142,7 @@
 				AAAA000000000000000000D1 /* WhisperKitIntegrationTests.swift */,
 				AAAA000000000000000000D8 /* TextPasterTests.swift */,
 				AAAA000000000000000000E4 /* TranscriptionPipelineTests.swift */,
+				AAAA000000000000000000F3 /* OllamaPostProcessorTests.swift */,
 				AAAA000000000000000000C5 /* Mocks */,
 				AAAA000000000000000000C7 /* Helpers */,
 				AAAA000000000000000000CE /* TestFixtures */,
@@ -189,6 +194,7 @@
 			isa = PBXGroup;
 			children = (
 				AAAA000000000000000000A8 /* PassthroughPostProcessor.swift */,
+				AAAA000000000000000000F1 /* OllamaPostProcessor.swift */,
 			);
 			path = PostProcessors;
 			sourceTree = "<group>";
@@ -420,6 +426,7 @@
 				AAAA000000000000000000EA /* MenuBarController.swift in Sources */,
 				AAAA000000000000000000ED /* RecordingOverlay.swift in Sources */,
 				AAAA000000000000000000EF /* SettingsView.swift in Sources */,
+			AAAA000000000000000000F2 /* OllamaPostProcessor.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -435,6 +442,7 @@
 				AAAA000000000000000000D2 /* WhisperKitIntegrationTests.swift in Sources */,
 				AAAA000000000000000000D9 /* TextPasterTests.swift in Sources */,
 				AAAA000000000000000000E5 /* TranscriptionPipelineTests.swift in Sources */,
+			AAAA000000000000000000F4 /* OllamaPostProcessorTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

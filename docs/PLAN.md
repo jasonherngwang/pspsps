@@ -207,17 +207,17 @@ Acceptance criteria:
 
 **Issue 15**
 
-Status: READY
+Status: COMPLETE
 
 Task: Implement `PostProcessors/OllamaPostProcessor.swift` per PRD Section 6.1. HTTP POST to `{host}/api/chat` with `stream: false`, system prompt (all 6 cleanup rules + all 4 "Do NOT" rules from PRD), and user message format `"Active app: {app}\nTranscript: {text}"`. Parse `response.message.content`. Implement `isAvailable` check via `GET {host}/api/tags` — also verify the configured model name exists in the tags list. On any failure (connection refused, model not found, timeout), fall back to `PassthroughPostProcessor` and log the reason. Write unit tests using a mock `URLProtocol` subclass to intercept HTTP requests.
 
 Acceptance criteria:
-- [ ] `xcodebuild test` passes: request body JSON has correct structure (model, messages array with system + user, stream: false)
-- [ ] `xcodebuild test` passes: system prompt text contains all required cleanup rules from PRD Section 6.1
-- [ ] `xcodebuild test` passes: successful mock response parses message.content correctly
-- [ ] `xcodebuild test` passes: connection failure returns raw transcript (fallback behavior)
-- [ ] `xcodebuild test` passes: model-not-found response returns raw transcript (fallback behavior)
-- [ ] isAvailable checks both host reachability and model existence
+- [x] `xcodebuild test` passes: request body JSON has correct structure (model, messages array with system + user, stream: false)
+- [x] `xcodebuild test` passes: system prompt text contains all required cleanup rules from PRD Section 6.1
+- [x] `xcodebuild test` passes: successful mock response parses message.content correctly
+- [x] `xcodebuild test` passes: connection failure returns raw transcript (fallback behavior)
+- [x] `xcodebuild test` passes: model-not-found response returns raw transcript (fallback behavior)
+- [x] isAvailable checks both host reachability and model existence
 
 
 **Issue 16**

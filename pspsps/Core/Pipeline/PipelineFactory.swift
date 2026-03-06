@@ -18,8 +18,7 @@ struct PipelineFactory {
         case .passthrough:
             postProcessor = PassthroughPostProcessor()
         case .ollama:
-            // OllamaPostProcessor will be implemented in Issue 15
-            postProcessor = PassthroughPostProcessor()
+            postProcessor = OllamaPostProcessor(model: config.ollamaModel, host: config.ollamaHost)
         }
 
         return TranscriptionPipeline(asrEngine: asrEngine, postProcessor: postProcessor, config: config)
