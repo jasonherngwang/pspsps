@@ -237,17 +237,17 @@ Acceptance criteria:
 
 **Issue 17**
 
-Status: READY
+Status: COMPLETE
 
 Task: Implement `UI/Onboarding/ASRPickerView.swift` per PRD Section 10.1. Two engine cards: WhisperKit (pre-selected, "Recommended" badge, "~600 MB", "~0.45s latency", "Best for whispers, accents, noise") and Parakeet ("~480 MB", "~0.19s latency", "Best for clear speech, speed"). If Parakeet is unavailable (stub), show its card as disabled/grayed with "Coming soon". Single "Download & Continue" button triggers ModelDownloadManager download for the selected engine. Progress bar replaces button during download. Implement engine switching in ASR Settings tab: "Switch" button if already downloaded, unloads current model and loads new one. Menu bar spinner during switch.
 
 Acceptance criteria:
-- [ ] `xcodebuild build` succeeds
-- [ ] ASRPickerView shows two engine cards with correct metadata
-- [ ] WhisperKit card has "Recommended" badge and is pre-selected
-- [ ] If Parakeet unavailable: card is disabled with "Coming soon" label
-- [ ] Download button triggers ModelDownloadManager and shows progress
-- [ ] Engine switch calls unloadModel() on current, loadModel() on new
+- [x] `xcodebuild build` succeeds
+- [x] ASRPickerView shows two engine cards with correct metadata
+- [x] WhisperKit card has "Recommended" badge and is pre-selected
+- [x] If Parakeet unavailable: card is disabled with "Coming soon" label
+- [x] Download button triggers ModelDownloadManager and shows progress
+- [x] Engine switch calls unloadModel() on current, loadModel() on new
 
 
 **Issue 18**
@@ -267,7 +267,7 @@ Acceptance criteria:
 
 **Issue 19**
 
-Status: BLOCKED by Issue 17
+Status: READY
 
 Task: Implement full onboarding flow per PRD Section 10: `UI/Onboarding/OnboardingView.swift` orchestrates three steps. Step 1: ASRPickerView (from Issue 17) — must complete download before advancing. Step 2: `AccessibilityPermissionView.swift` — explain why Accessibility is needed, button to open System Settings (`Privacy & Security > Accessibility`), poll `AXIsProcessTrusted()` every 500ms, auto-advance when granted. Step 3: `MicrophonePermissionView.swift` — request microphone permission via `AVCaptureDevice.requestAccess(for: .audio)`, advance on grant. Store `hasCompletedOnboarding` in UserDefaults. Show onboarding on first launch only. On subsequent launches, skip directly to menu bar.
 

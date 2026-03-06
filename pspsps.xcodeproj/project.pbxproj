@@ -44,6 +44,7 @@
 		AAAA000000000000000000F2 /* OllamaPostProcessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAAA000000000000000000F1 /* OllamaPostProcessor.swift */; };
 		AAAA000000000000000000F4 /* OllamaPostProcessorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAAA000000000000000000F3 /* OllamaPostProcessorTests.swift */; };
 		AAAA000000000000000000F6 /* ParakeetEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAAA000000000000000000F5 /* ParakeetEngine.swift */; };
+		AAAA000000000000000000F9 /* ASRPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAAA000000000000000000F8 /* ASRPickerView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -86,6 +87,7 @@
 		AAAA000000000000000000EE /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		AAAA000000000000000000F1 /* OllamaPostProcessor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OllamaPostProcessor.swift; sourceTree = "<group>"; };
 		AAAA000000000000000000F3 /* OllamaPostProcessorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OllamaPostProcessorTests.swift; sourceTree = "<group>"; };
+		AAAA000000000000000000F8 /* ASRPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ASRPickerView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -260,8 +262,17 @@
 				AAAA000000000000000000E9 /* MenuBarController.swift */,
 				AAAA000000000000000000EC /* RecordingOverlay.swift */,
 				AAAA000000000000000000F0 /* Settings */,
+				AAAA000000000000000000F7 /* Onboarding */,
 			);
 			path = UI;
+			sourceTree = "<group>";
+		};
+		AAAA000000000000000000F7 /* Onboarding */ = {
+			isa = PBXGroup;
+			children = (
+				AAAA000000000000000000F8 /* ASRPickerView.swift */,
+			);
+			path = Onboarding;
 			sourceTree = "<group>";
 		};
 		AAAA000000000000000000F0 /* Settings */ = {
@@ -431,6 +442,7 @@
 				AAAA000000000000000000EF /* SettingsView.swift in Sources */,
 			AAAA000000000000000000F2 /* OllamaPostProcessor.swift in Sources */,
 				AAAA000000000000000000F6 /* ParakeetEngine.swift in Sources */,
+				AAAA000000000000000000F9 /* ASRPickerView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

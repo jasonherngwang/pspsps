@@ -206,14 +206,6 @@ struct ASREngineSettingsTab: View {
                             .foregroundStyle(.blue)
                             .clipShape(Capsule())
                     }
-                    if engine == .parakeet {
-                        Text("Coming soon")
-                            .font(.caption2)
-                            .padding(.horizontal, 6).padding(.vertical, 2)
-                            .background(.secondary.opacity(0.15))
-                            .foregroundStyle(.secondary)
-                            .clipShape(Capsule())
-                    }
                 }
                 Text(subtitle)
                     .font(.caption)
@@ -231,7 +223,6 @@ struct ASREngineSettingsTab: View {
             }
         }
         .padding(.vertical, 4)
-        .opacity(engine == .parakeet ? 0.65 : 1.0)
     }
 
     @ViewBuilder
@@ -266,7 +257,6 @@ struct ASREngineSettingsTab: View {
                     }
                 }
             }
-            .disabled(engine == .parakeet)
 
         case .downloading:
             ProgressView().controlSize(.small)
