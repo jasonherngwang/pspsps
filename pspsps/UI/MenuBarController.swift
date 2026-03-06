@@ -8,12 +8,14 @@ final class MenuBarController {
 
     private let statusItem: NSStatusItem
     private let popover = NSPopover()
+    private let historyPopover = NSPopover()
     private var cancellables: Set<AnyCancellable> = []
 
     init(coordinator: AppCoordinator) {
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength)
         setupButton()
         setupPopover(coordinator: coordinator)
+        setupHistoryPopover(coordinator: coordinator)
         observeState(coordinator: coordinator)
     }
 
@@ -31,6 +33,16 @@ final class MenuBarController {
         popover.behavior = .transient
         popover.contentViewController = NSHostingController(
             rootView: MenuBarPopoverView(coordinator: coordinator)
+        )
+    }
+
+    private func setupHistoryPopover(coordinator: AppCoordinator) {
+        historyPopover.behavior = .transient
+        historyPopover.contentViewController = NSHostingController(
+            rootView: HistoryPopoverView(
+                history: coordinator.transcriptHistory,
+                textPaster: coordinator.textPaster
+            )
         )
     }
 
@@ -59,7 +71,8 @@ final class MenuBarController {
         let settingsItem = NSMenuItem(title: "Settings", action: #selector(openSettings), keyEquivalent: ",")
         settingsItem.target = self
 
-        let historyItem = NSMenuItem(title: "History", action: nil, keyEquivalent: "")
+        let historyItem = NSMenuItem(title: "History", action: #selector(showHistory), keyEquivalent: "")
+        historyItem.target = self
 
         let quitItem = NSMenuItem(title: "Quit", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q")
 
@@ -77,6 +90,19 @@ final class MenuBarController {
     @objc private func openSettings() {
         NSApp.sendAction(Selector(("showSettingsWindow:")), to: nil, from: nil)
         NSApp.activate(ignoringOtherApps: true)
+    }
+
+    @objc private func showHistory() {
+        // Dispatch so the context menu has time to dismiss before showing the popover.
+        DispatchQueue.main.async { [weak self] in
+            guard let self, let button = self.statusItem.button else { return }
+            if self.historyPopover.isShown {
+                self.historyPopover.performClose(nil)
+            } else {
+                self.popover.performClose(nil)
+                self.historyPopover.show(relativeTo: button.bounds, of: button, preferredEdge: .minY)
+            }
+        }
     }
 
     // MARK: - State Observation

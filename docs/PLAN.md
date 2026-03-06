@@ -252,17 +252,17 @@ Acceptance criteria:
 
 **Issue 18**
 
-Status: READY
+Status: COMPLETE
 
 Task: Implement `History/TranscriptEntry.swift` (Codable struct: id UUID, text, timestamp Date, sourceApp String?, sourceAppBundleID String?) and `History/TranscriptHistory.swift` (persist as JSON array to `~/Library/Application Support/pspsps/history.json`). Provide: `add(entry:)` (prepend, trim to maxHistoryItems), `delete(id:)`, `search(query:) -> [TranscriptEntry]` (case-insensitive substring match on text), `clear()`, `var entries: [TranscriptEntry]`. Create Application Support directory if needed. Load on init, save after mutations. Implement history UI as NSPopover content from menu bar: list with timestamp + preview, click to re-paste via TextPaster, swipe-to-delete, search field. Wire "History" menu item to show this popover. Write unit tests.
 
 Acceptance criteria:
-- [ ] `xcodebuild test` passes: save 5 entries, create new instance, loaded entries match originals
-- [ ] `xcodebuild test` passes: search("fox") returns only entries containing "fox" (case-insensitive)
-- [ ] `xcodebuild test` passes: adding entries beyond maxHistoryItems drops oldest
-- [ ] `xcodebuild test` passes: delete(id:) removes specific entry
-- [ ] History popover renders entry list without crash
-- [ ] Click on entry calls TextPaster.paste() with entry text
+- [x] `xcodebuild test` passes: save 5 entries, create new instance, loaded entries match originals
+- [x] `xcodebuild test` passes: search("fox") returns only entries containing "fox" (case-insensitive)
+- [x] `xcodebuild test` passes: adding entries beyond maxHistoryItems drops oldest
+- [x] `xcodebuild test` passes: delete(id:) removes specific entry
+- [x] History popover renders entry list without crash
+- [x] Click on entry calls TextPaster.paste() with entry text
 
 
 **Issue 19**

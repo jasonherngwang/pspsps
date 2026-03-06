@@ -1,3 +1,4 @@
+import AppKit
 import AVFoundation
 import Combine
 import CoreGraphics
@@ -30,7 +31,12 @@ final class AppCoordinator: ObservableObject {
     let audioCaptureManager = AudioCaptureManager()
     let textPaster = TextPaster()
     let downloadManager = ModelDownloadManager()
+    let transcriptHistory = TranscriptHistory()
     private(set) var pipeline: TranscriptionPipeline
+
+    // Frontmost app captured at recording start so it can be stored with the entry.
+    private var capturedSourceApp: String?
+    private var capturedSourceAppBundleID: String?
 
     private let logger = Logger(subsystem: "com.pspsps.pspsps", category: "AppCoordinator")
     private var cancellables: Set<AnyCancellable> = []
@@ -151,6 +157,9 @@ final class AppCoordinator: ObservableObject {
 
     private func handleHotkeyStarted() {
         guard state == .idle else { return }
+        let frontmost = NSWorkspace.shared.frontmostApplication
+        capturedSourceApp = frontmost?.localizedName
+        capturedSourceAppBundleID = frontmost?.bundleIdentifier
         do {
             try audioCaptureManager.startCapture()
             state = .recording
@@ -174,6 +183,14 @@ final class AppCoordinator: ObservableObject {
                 if !trimmed.isEmpty {
                     lastTranscript = trimmed
                     textPaster.paste(trimmed)
+                    if self.config.keepTranscriptHistory {
+                        let entry = TranscriptEntry(
+                            text: trimmed,
+                            sourceApp: self.capturedSourceApp,
+                            sourceAppBundleID: self.capturedSourceAppBundleID
+                        )
+                        self.transcriptHistory.add(entry: entry)
+                    }
                 }
             } catch {
                 logger.error("Transcription error: \(error)")
