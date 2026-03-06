@@ -107,17 +107,17 @@ Acceptance criteria:
 
 **Issue 8**
 
-Status: READY
+Status: COMPLETE
 
 Task: Implement `Input/HotkeyManager.swift` per PRD Section 8.1. Register a CGEvent tap for keyDown + keyUp events. Match against configured keyCode and modifiers. Consume matched events by returning nil from the tap callback (prevent foreground app from receiving the hotkey). Support two modes: push-to-talk (keyDown = start, keyUp = stop) and toggle (keyDown = toggle). Check `AXIsProcessTrusted()` before attempting registration — expose a method to check permission status. Expose a callback/closure `onHotkeyEvent: (HotkeyEvent) -> Void` where HotkeyEvent is `.started` or `.stopped`.
 
 Acceptance criteria:
-- [ ] `xcodebuild build` succeeds
-- [ ] HotkeyManager compiles with CGEvent tap setup
-- [ ] Tap callback returns nil for matched events (consumes them)
-- [ ] Both PTT and Toggle modes are implemented
-- [ ] AXIsProcessTrusted() is checked before tap creation
-- [ ] HotkeyEvent enum has .started and .stopped cases
+- [x] `xcodebuild build` succeeds
+- [x] HotkeyManager compiles with CGEvent tap setup
+- [x] Tap callback returns nil for matched events (consumes them)
+- [x] Both PTT and Toggle modes are implemented
+- [x] AXIsProcessTrusted() is checked before tap creation
+- [x] HotkeyEvent enum has .started and .stopped cases
 
 
 **Issue 9**
