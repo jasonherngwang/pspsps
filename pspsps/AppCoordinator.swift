@@ -18,6 +18,7 @@ final class AppCoordinator: ObservableObject {
     }
 
     @Published private(set) var state: AppState = .idle
+    @Published private(set) var lastTranscript: String = ""
 
     let hotkeyManager = HotkeyManager()
     let audioCaptureManager = AudioCaptureManager()
@@ -96,8 +97,10 @@ final class AppCoordinator: ObservableObject {
         Task {
             do {
                 let text = try await pipeline.run(buffer: buffer)
-                if !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-                    textPaster.paste(text)
+                let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
+                if !trimmed.isEmpty {
+                    lastTranscript = trimmed
+                    textPaster.paste(trimmed)
                 }
             } catch {
                 logger.error("Transcription error: \(error)")

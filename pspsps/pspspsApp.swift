@@ -17,10 +17,12 @@ struct pspspsApp: App {
 final class AppDelegate: NSObject, NSApplicationDelegate {
     private var coordinator: AppCoordinator?
     private var menuBarController: MenuBarController?
+    private var recordingOverlay: RecordingOverlay?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         let coord = AppCoordinator()
         coordinator = coord
         menuBarController = MenuBarController(coordinator: coord)
+        recordingOverlay = RecordingOverlay(coordinator: coord)
     }
 }

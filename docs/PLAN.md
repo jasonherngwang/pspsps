@@ -178,17 +178,17 @@ Acceptance criteria:
 
 **Issue 13**
 
-Status: READY
+Status: COMPLETE
 
 Task: Implement `UI/RecordingOverlay.swift` per PRD Section 11.3 as a floating NSPanel — `styleMask: [.nonactivatingPanel]`, `level: .floating`, `collectionBehavior: [.canJoinAllSpaces, .fullScreenAuxiliary]` (not in Dock, not in Mission Control). Show "Recording..." during PTT hold, "Transcribing..." during ASR, truncated result (first 40 chars) after paste. Auto-dismiss after `AppConfig.overlayDurationSeconds`. Position at bottom-center of active screen. Also implement the menu bar left-click popover showing the last transcript text and a "Copy" button to re-paste.
 
 Acceptance criteria:
-- [ ] `xcodebuild build` succeeds
-- [ ] Overlay is a non-activating floating panel (does not steal focus)
-- [ ] Overlay displays correct text per state (recording, transcribing, result)
-- [ ] Overlay auto-dismisses after configured duration
-- [ ] Overlay positioned at bottom-center of screen
-- [ ] Menu bar popover shows last transcript text
+- [x] `xcodebuild build` succeeds
+- [x] Overlay is a non-activating floating panel (does not steal focus)
+- [x] Overlay displays correct text per state (recording, transcribing, result)
+- [x] Overlay auto-dismisses after configured duration
+- [x] Overlay positioned at bottom-center of screen
+- [x] Menu bar popover shows last transcript text
 
 
 **Issue 14**

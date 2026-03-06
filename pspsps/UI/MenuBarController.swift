@@ -13,7 +13,7 @@ final class MenuBarController {
     init(coordinator: AppCoordinator) {
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength)
         setupButton()
-        setupPopover()
+        setupPopover(coordinator: coordinator)
         observeState(coordinator: coordinator)
     }
 
@@ -27,10 +27,10 @@ final class MenuBarController {
         button.sendAction(on: [.leftMouseUp, .rightMouseUp])
     }
 
-    private func setupPopover() {
+    private func setupPopover(coordinator: AppCoordinator) {
         popover.behavior = .transient
         popover.contentViewController = NSHostingController(
-            rootView: MenuBarPopoverView()
+            rootView: MenuBarPopoverView(coordinator: coordinator)
         )
     }
 
@@ -112,22 +112,45 @@ final class MenuBarController {
     }
 }
 
-// MARK: - Popover Content (placeholder)
+// MARK: - Popover Content
 
 private struct MenuBarPopoverView: View {
+    @ObservedObject var coordinator: AppCoordinator
+
     var body: some View {
-        VStack(spacing: 10) {
-            Image(systemName: "mic.circle")
-                .font(.largeTitle)
-                .foregroundStyle(.secondary)
-            Text("pspsps")
-                .font(.headline)
-            Text("Press the hotkey to start recording.")
-                .font(.caption)
-                .foregroundStyle(.secondary)
-                .multilineTextAlignment(.center)
+        VStack(alignment: .leading, spacing: 12) {
+            if coordinator.lastTranscript.isEmpty {
+                VStack(spacing: 8) {
+                    Image(systemName: "mic.circle")
+                        .font(.largeTitle)
+                        .foregroundStyle(.secondary)
+                    Text("pspsps")
+                        .font(.headline)
+                    Text("Press the hotkey to start recording.")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .multilineTextAlignment(.center)
+                }
+                .frame(maxWidth: .infinity)
+            } else {
+                Text("Last transcript")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                ScrollView {
+                    Text(coordinator.lastTranscript)
+                        .font(.body)
+                        .textSelection(.enabled)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                }
+                .frame(maxHeight: 120)
+                Button("Copy & Paste") {
+                    coordinator.textPaster.paste(coordinator.lastTranscript)
+                }
+                .buttonStyle(.bordered)
+                .frame(maxWidth: .infinity)
+            }
         }
         .padding()
-        .frame(width: 260, height: 140)
+        .frame(width: 260)
     }
 }
