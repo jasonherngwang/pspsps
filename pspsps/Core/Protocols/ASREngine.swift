@@ -1,6 +1,6 @@
 import AVFoundation
 
-protocol ASREngine: AnyObject {
+protocol ASREngine: AnyObject, Sendable {
     var name: String { get }
     var isAvailable: Bool { get }
     func loadModel() async throws

@@ -150,21 +150,21 @@ Acceptance criteria:
 
 **Issue 11**
 
-Status: READY
+Status: COMPLETE
 
 Task: Wire the complete end-to-end flow in an app coordinator / controller class. On hotkey start → `AudioCaptureManager.startCapture()`. On hotkey stop → `stopCapture()` → `pipeline.run(buffer)` → `TextPaster.paste(result)`. Implement a state machine: `idle → recording → transcribing → idle`. Catch all pipeline errors (log them, do not crash). Connect to the app entry point so the flow is active at launch (with a loaded model).
 
 Acceptance criteria:
-- [ ] `xcodebuild build` succeeds
-- [ ] State machine has three states: idle, recording, transcribing
-- [ ] Transitions: idle → recording (hotkey start), recording → transcribing (hotkey stop), transcribing → idle (paste complete or error)
-- [ ] Pipeline errors are caught and logged, not thrown to caller
-- [ ] App coordinator holds references to HotkeyManager, AudioCaptureManager, TranscriptionPipeline, TextPaster
+- [x] `xcodebuild build` succeeds
+- [x] State machine has three states: idle, recording, transcribing
+- [x] Transitions: idle → recording (hotkey start), recording → transcribing (hotkey stop), transcribing → idle (paste complete or error)
+- [x] Pipeline errors are caught and logged, not thrown to caller
+- [x] App coordinator holds references to HotkeyManager, AudioCaptureManager, TranscriptionPipeline, TextPaster
 
 
 **Issue 12**
 
-Status: BLOCKED by Issue 11
+Status: READY
 
 Task: Implement `UI/MenuBarController.swift` per PRD Section 11.1. Create NSStatusItem with a microphone SF Symbol icon. Icon state machine synced to the app coordinator's state: idle (default color), recording (red tint or highlighted), processing/transcribing (activity indicator or alternate icon), error (warning badge overlay). Left-click opens a popover (placeholder for now). Right-click context menu with: Settings (opens Settings window), History (placeholder), Quit (NSApp.terminate). Remove any main window — app is menu-bar-only.
 

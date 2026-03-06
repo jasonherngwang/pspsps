@@ -37,6 +37,7 @@
 		AAAA000000000000000000E1 /* TranscriptionPipeline.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAAA000000000000000000E0 /* TranscriptionPipeline.swift */; };
 		AAAA000000000000000000E3 /* PipelineFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAAA000000000000000000E2 /* PipelineFactory.swift */; };
 		AAAA000000000000000000E5 /* TranscriptionPipelineTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAAA000000000000000000E4 /* TranscriptionPipelineTests.swift */; };
+		AAAA000000000000000000E8 /* AppCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAAA000000000000000000E7 /* AppCoordinator.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -72,6 +73,7 @@
 		AAAA000000000000000000E0 /* TranscriptionPipeline.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TranscriptionPipeline.swift; sourceTree = "<group>"; };
 		AAAA000000000000000000E2 /* PipelineFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PipelineFactory.swift; sourceTree = "<group>"; };
 		AAAA000000000000000000E4 /* TranscriptionPipelineTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TranscriptionPipelineTests.swift; sourceTree = "<group>"; };
+		AAAA000000000000000000E7 /* AppCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppCoordinator.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -108,6 +110,7 @@
 			children = (
 				AAAA00000000000000000010 /* pspspsApp.swift */,
 				AAAA000000000000000000AA /* AppConfig.swift */,
+				AAAA000000000000000000E7 /* AppCoordinator.swift */,
 				AAAA00000000000000000011 /* pspsps.entitlements */,
 				AAAA00000000000000000012 /* Info.plist */,
 				AAAA000000000000000000C1 /* Core */,
@@ -388,6 +391,7 @@
 				AAAA000000000000000000D7 /* TextPaster.swift in Sources */,
 				AAAA000000000000000000E1 /* TranscriptionPipeline.swift in Sources */,
 				AAAA000000000000000000E3 /* PipelineFactory.swift in Sources */,
+				AAAA000000000000000000E8 /* AppCoordinator.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
