@@ -25,6 +25,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private var onboardingWindow: NSWindow?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
+        #if !arch(arm64)
+        let alert = NSAlert()
+        alert.messageText = "pspsps requires Apple Silicon (M1 or later)"
+        alert.informativeText = "This app uses on-device AI models optimized for Apple Silicon. Please run on a Mac with an M1 chip or later."
+        alert.alertStyle = .critical
+        alert.runModal()
+        NSApp.terminate(nil)
+        return
+        #endif
+
         menuBarController = MenuBarController(coordinator: coordinator)
         recordingOverlay = RecordingOverlay(coordinator: coordinator)
 

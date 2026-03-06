@@ -108,16 +108,41 @@ final class MenuBarController {
     // MARK: - State Observation
 
     private func observeState(coordinator: AppCoordinator) {
+        // Re-render icon whenever any of the relevant published properties change.
         coordinator.$state
+            .combineLatest(coordinator.$modelNotLoaded, coordinator.$accessibilityNotGranted)
             .receive(on: DispatchQueue.main)
-            .sink { [weak self] state in
-                self?.updateIcon(for: state)
+            .sink { [weak self] state, modelNotLoaded, accessibilityNotGranted in
+                self?.updateIcon(
+                    state: state,
+                    modelNotLoaded: modelNotLoaded,
+                    accessibilityNotGranted: accessibilityNotGranted
+                )
             }
             .store(in: &cancellables)
     }
 
-    private func updateIcon(for state: AppCoordinator.AppState) {
+    private func updateIcon(
+        state: AppCoordinator.AppState,
+        modelNotLoaded: Bool,
+        accessibilityNotGranted: Bool
+    ) {
         guard let button = statusItem.button else { return }
+
+        if accessibilityNotGranted {
+            // Lock icon: accessibility must be granted for hotkey to work.
+            button.image = makeIcon(systemName: "lock.fill", template: true)
+            button.contentTintColor = nil
+            return
+        }
+
+        if modelNotLoaded {
+            // Warning badge: model failed to load.
+            button.image = makeIcon(systemName: "exclamationmark.triangle.fill", template: false)
+            button.contentTintColor = .systemYellow
+            return
+        }
+
         switch state {
         case .idle:
             button.image = makeIcon(systemName: "mic", template: true)

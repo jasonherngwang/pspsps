@@ -14,6 +14,7 @@ final class AudioCaptureManager: AudioInputSource {
     private let lock = NSLock()
     private var maxDurationTimer: Timer?
     private var isCapturing = false
+    private var configChangeObserver: (any NSObjectProtocol)?
 
     private let outputFormat = AVAudioFormat(
         commonFormat: .pcmFormatFloat32,
@@ -24,6 +25,9 @@ final class AudioCaptureManager: AudioInputSource {
 
     /// Called when recording auto-stops due to max duration being reached.
     var onAutoStop: ((AVAudioPCMBuffer) -> Void)?
+
+    /// Called when the audio input device disconnects while recording.
+    var onDeviceDisconnected: (() -> Void)?
 
     func startCapture() throws {
         guard !isCapturing else { return }
@@ -47,6 +51,14 @@ final class AudioCaptureManager: AudioInputSource {
 
         try engine.start()
 
+        configChangeObserver = NotificationCenter.default.addObserver(
+            forName: .AVAudioEngineConfigurationChange,
+            object: engine,
+            queue: nil
+        ) { [weak self] _ in
+            DispatchQueue.main.async { self?.handleConfigurationChange() }
+        }
+
         let maxDuration = AppConfig.current.maxRecordingDurationSeconds
         let timer = Timer(timeInterval: maxDuration, repeats: false) { [weak self] _ in
             guard let self else { return }
@@ -67,6 +79,11 @@ final class AudioCaptureManager: AudioInputSource {
         maxDurationTimer?.invalidate()
         maxDurationTimer = nil
 
+        if let obs = configChangeObserver {
+            NotificationCenter.default.removeObserver(obs)
+            configChangeObserver = nil
+        }
+
         engine.inputNode.removeTap(onBus: 0)
         engine.stop()
 
@@ -79,6 +96,12 @@ final class AudioCaptureManager: AudioInputSource {
     }
 
     // MARK: - Private
+
+    private func handleConfigurationChange() {
+        guard isCapturing else { return }
+        _ = stopCapture()
+        onDeviceDisconnected?()
+    }
 
     private func convert(_ buffer: AVAudioPCMBuffer, to targetFormat: AVAudioFormat) -> AVAudioPCMBuffer? {
         guard let converter = AVAudioConverter(from: buffer.format, to: targetFormat) else { return nil }

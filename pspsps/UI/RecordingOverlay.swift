@@ -19,6 +19,7 @@ final class RecordingOverlay {
     init(coordinator: AppCoordinator) {
         panel = makePanel()
         subscribeToState(of: coordinator)
+        subscribeToToasts(of: coordinator)
     }
 
     // MARK: - Private
@@ -43,7 +44,7 @@ final class RecordingOverlay {
     private func subscribeToState(of coordinator: AppCoordinator) {
         coordinator.$state
             .receive(on: DispatchQueue.main)
-            .sink { [weak self, weak coordinator] newState in
+            .sink { [weak self] newState in
                 guard let self else { return }
                 switch newState {
                 case .recording:
@@ -51,16 +52,31 @@ final class RecordingOverlay {
                 case .transcribing:
                     self.present(text: "Transcribing...")
                 case .idle:
-                    if self.previousState == .transcribing,
-                       let transcript = coordinator?.lastTranscript,
-                       !transcript.isEmpty {
-                        self.present(text: String(transcript.prefix(40)))
-                        self.scheduleDismiss()
-                    } else {
+                    // If coming from recording (not transcribing), dismiss immediately.
+                    // Transcribing→idle is handled by the toast subscription below.
+                    if self.previousState != .transcribing {
                         self.dismiss()
                     }
                 }
                 self.previousState = newState
+            }
+            .store(in: &cancellables)
+    }
+
+    private func subscribeToToasts(of coordinator: AppCoordinator) {
+        // showToast delivers synchronously from @MainActor, so ordering is preserved:
+        // coordinator fires showToast BEFORE setting state = .idle, so the toast is
+        // shown first. The state → .idle delivery (async via receive(on:)) arrives later
+        // but is ignored for the transcribing→idle path.
+        coordinator.showToast
+            .sink { [weak self] message in
+                guard let self else { return }
+                if message.isEmpty {
+                    self.dismiss()
+                } else {
+                    self.present(text: message)
+                    self.scheduleDismiss()
+                }
             }
             .store(in: &cancellables)
     }

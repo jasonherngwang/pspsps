@@ -283,15 +283,15 @@ Acceptance criteria:
 
 **Issue 20**
 
-Status: READY
+Status: COMPLETE
 
 Task: Implement all remaining error handling from PRD Section 13. Intel architecture check on launch: if `ProcessInfo.processInfo.processorArchitecture` is not arm64 (check `#if !arch(arm64)`), show alert "pspsps requires Apple Silicon (M1 or later)" and call `NSApp.terminate(nil)`. Empty transcription: show "Nothing detected" overlay toast, do not call TextPaster. Paste failure: write to clipboard, show "Copied to clipboard" toast. Audio device disconnect: stop recording, notify via overlay, fall back to system default. Model not loaded: menu bar warning badge, notification with download action. Accessibility not granted: menu bar lock icon, click opens onboarding. Microphone denied: notification with System Settings deeplink. Max duration exceeded: auto-stop with "Max duration reached" toast. Ollama model not found: notification, fall back to Passthrough. Add sound feedback: play system sounds on recording start/stop when `AppConfig.soundFeedbackEnabled` is true. Run full test suite to verify no regressions.
 
 Acceptance criteria:
-- [ ] `xcodebuild build` succeeds with zero errors
-- [ ] `xcodebuild test` passes all existing unit and integration tests
-- [ ] Intel check: `#if !arch(arm64)` block shows alert and terminates
-- [ ] Empty transcription does not trigger paste
-- [ ] Ollama failure falls back to Passthrough (does not block transcription)
-- [ ] Sound feedback plays on recording start/stop when enabled
-- [ ] All error states surface via overlay toast or menu bar badge (no modal dialogs during recording)
+- [x] `xcodebuild build` succeeds with zero errors
+- [x] `xcodebuild test` passes all existing unit and integration tests
+- [x] Intel check: `#if !arch(arm64)` block shows alert and terminates
+- [x] Empty transcription does not trigger paste
+- [x] Ollama failure falls back to Passthrough (does not block transcription)
+- [x] Sound feedback plays on recording start/stop when enabled
+- [x] All error states surface via overlay toast or menu bar badge (no modal dialogs during recording)

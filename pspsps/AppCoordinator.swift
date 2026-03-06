@@ -22,6 +22,15 @@ final class AppCoordinator: ObservableObject {
     @Published private(set) var state: AppState = .idle
     @Published private(set) var lastTranscript: String = ""
 
+    /// Fires with a brief overlay message (non-empty) or empty string to dismiss.
+    let showToast = PassthroughSubject<String, Never>()
+
+    /// True when the ASR model failed to load (shows warning badge in menu bar).
+    @Published private(set) var modelNotLoaded: Bool = false
+
+    /// True when Accessibility permission has not been granted (shows lock icon in menu bar).
+    @Published private(set) var accessibilityNotGranted: Bool = false
+
     /// Live-bound app configuration. Saving to UserDefaults on every change.
     @Published var config: AppConfig = .current {
         didSet { config.save() }
@@ -68,11 +77,14 @@ final class AppCoordinator: ObservableObject {
         let oldEngine = pipeline.asrEngine
         pipeline = PipelineFactory.build(from: config)
         oldEngine.unloadModel()
+        modelNotLoaded = false
         Task {
             do {
                 try await self.pipeline.asrEngine.loadModel()
+                self.modelNotLoaded = false
             } catch {
                 self.logger.error("Model reload failed: \(error)")
+                self.modelNotLoaded = true
             }
         }
     }
@@ -116,10 +128,13 @@ final class AppCoordinator: ObservableObject {
     }
 
     private func startup() async {
+        checkMicrophonePermission()
         do {
             try await pipeline.asrEngine.loadModel()
+            modelNotLoaded = false
         } catch {
             logger.error("Model load failed: \(error)")
+            modelNotLoaded = true
         }
         startHotkeyListening()
     }
@@ -131,6 +146,10 @@ final class AppCoordinator: ObservableObject {
                 modifiers: CGEventFlags(rawValue: config.hotkeyModifiers),
                 mode: config.hotkeyMode
             )
+            accessibilityNotGranted = false
+        } catch HotkeyManagerError.accessibilityNotGranted {
+            accessibilityNotGranted = true
+            logger.warning("Accessibility permission not granted — hotkey disabled")
         } catch {
             logger.error("Hotkey listener failed to start: \(error)")
         }
@@ -150,7 +169,19 @@ final class AppCoordinator: ObservableObject {
         audioCaptureManager.onAutoStop = { [weak self] buffer in
             MainActor.assumeIsolated {
                 guard let self else { return }
+                self.playFeedbackSound("Pop")
+                self.showToast.send("Max duration reached")
                 self.runTranscription(buffer: buffer)
+            }
+        }
+
+        audioCaptureManager.onDeviceDisconnected = { [weak self] in
+            MainActor.assumeIsolated {
+                guard let self else { return }
+                if self.state == .recording {
+                    self.showToast.send("Audio device disconnected")
+                    self.state = .idle
+                }
             }
         }
     }
@@ -163,6 +194,7 @@ final class AppCoordinator: ObservableObject {
         do {
             try audioCaptureManager.startCapture()
             state = .recording
+            playFeedbackSound("Tink")
         } catch {
             logger.error("Audio capture failed to start: \(error)")
         }
@@ -170,6 +202,7 @@ final class AppCoordinator: ObservableObject {
 
     private func handleHotkeyStopped() {
         guard state == .recording else { return }
+        playFeedbackSound("Pop")
         let buffer = audioCaptureManager.stopCapture()
         runTranscription(buffer: buffer)
     }
@@ -180,9 +213,16 @@ final class AppCoordinator: ObservableObject {
             do {
                 let text = try await pipeline.run(buffer: buffer)
                 let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
-                if !trimmed.isEmpty {
+                if trimmed.isEmpty {
+                    showToast.send("Nothing detected")
+                } else {
                     lastTranscript = trimmed
-                    textPaster.paste(trimmed)
+                    let pasted = textPaster.paste(trimmed)
+                    if pasted {
+                        showToast.send(String(trimmed.prefix(40)))
+                    } else {
+                        showToast.send("Copied to clipboard")
+                    }
                     if self.config.keepTranscriptHistory {
                         let entry = TranscriptEntry(
                             text: trimmed,
@@ -194,8 +234,28 @@ final class AppCoordinator: ObservableObject {
                 }
             } catch {
                 logger.error("Transcription error: \(error)")
+                showToast.send("")
             }
             state = .idle
+        }
+    }
+
+    // MARK: - Sound Feedback
+
+    private func playFeedbackSound(_ name: String) {
+        guard config.soundFeedbackEnabled else { return }
+        NSSound(named: NSSound.Name(name))?.play()
+    }
+
+    // MARK: - Permissions
+
+    private func checkMicrophonePermission() {
+        switch AVCaptureDevice.authorizationStatus(for: .audio) {
+        case .denied, .restricted:
+            logger.warning("Microphone access denied — recording will not work")
+            showToast.send("Microphone access denied — open System Settings")
+        default:
+            break
         }
     }
 }

@@ -1,11 +1,16 @@
+import ApplicationServices
 import Cocoa
 import CoreGraphics
 
 final class TextPaster: @unchecked Sendable {
 
-    /// Writes `text` to the general pasteboard, synthesizes a Cmd+V keystroke,
-    /// then restores the previous pasteboard contents after `restoreDelay` seconds.
-    func paste(_ text: String, restoreDelay: Double? = nil) {
+    /// Writes `text` to the general pasteboard, then synthesizes a Cmd+V keystroke
+    /// if Accessibility permission is granted.
+    ///
+    /// Returns `true` if the paste keystroke was synthesized, `false` if Accessibility
+    /// permission was not granted (text is still written to the clipboard in that case).
+    @discardableResult
+    func paste(_ text: String, restoreDelay: Double? = nil) -> Bool {
         let delay = restoreDelay ?? AppConfig.current.pasteboardRestoreDelaySeconds
         let pasteboard = NSPasteboard.general
 
@@ -16,8 +21,11 @@ final class TextPaster: @unchecked Sendable {
         pasteboard.clearContents()
         pasteboard.setString(text, forType: .string)
 
-        // Synthesize Cmd+V so the frontmost app pastes.
-        synthesizeCmdV()
+        // Only synthesize the keystroke if Accessibility is trusted.
+        let pasted = AXIsProcessTrusted()
+        if pasted {
+            synthesizeCmdV()
+        }
 
         // After the delay, restore the previous pasteboard contents.
         DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
@@ -26,6 +34,8 @@ final class TextPaster: @unchecked Sendable {
                 pasteboard.setString(saved, forType: .string)
             }
         }
+
+        return pasted
     }
 
     // MARK: - Private
