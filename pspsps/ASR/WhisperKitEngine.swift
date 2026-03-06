@@ -2,14 +2,15 @@ import AVFoundation
 import WhisperKit
 
 class WhisperKitEngine: ASREngine {
-    let name = "WhisperKit (large-v3-turbo)"
+    let name = "WhisperKit"
     private var whisperKit: WhisperKit?
 
     var isAvailable: Bool { whisperKit != nil }
 
     func loadModel() async throws {
+        // model: nil → WhisperKit selects the recommended model for this device
         whisperKit = try await WhisperKit(
-            model: "openai_whisper-large-v3-turbo",
+            model: nil,
             downloadBase: Self.modelDirectory,
             computeOptions: ModelComputeOptions(
                 audioEncoderCompute: .cpuAndNeuralEngine,

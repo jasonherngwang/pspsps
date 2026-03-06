@@ -94,15 +94,15 @@ Acceptance criteria:
 
 **Issue 7**
 
-Status: READY
+Status: COMPLETE
 
 Task: Generate a test audio fixture using macOS TTS per PRD Section 18.1. Run: `say -o <path>/test_speech.aiff "The quick brown fox jumps over the lazy dog"` then `afconvert <path>/test_speech.aiff -f WAVE -d LEI16@16000 -c 1 <path>/test_speech.wav` and remove the .aiff. Place the .wav in a `TestFixtures/` directory accessible to the test target. Write an integration test that loads the WhisperKit model and transcribes the test audio. The first run will download the model (~600 MB) — use a generous test timeout (300+ seconds).
 
 Acceptance criteria:
-- [ ] `TestFixtures/test_speech.wav` exists, is 16kHz mono WAV
-- [ ] Integration test: WhisperKit model loads without error
-- [ ] Integration test: transcription of test_speech.wav returns non-empty string
-- [ ] Integration test: transcription result contains at least 3 recognizable words from the input phrase (case-insensitive fuzzy match)
+- [x] `TestFixtures/test_speech.wav` exists, is 16kHz mono WAV
+- [x] Integration test: WhisperKit model loads without error
+- [x] Integration test: transcription of test_speech.wav returns non-empty string
+- [x] Integration test: transcription result contains at least 3 recognizable words from the input phrase (case-insensitive fuzzy match)
 
 
 **Issue 8**
@@ -136,7 +136,7 @@ Acceptance criteria:
 
 **Issue 10**
 
-Status: BLOCKED by Issue 7
+Status: READY
 
 Task: Implement `Core/Pipeline/TranscriptionPipeline.swift` per PRD Section 4.3 with cancellation support — hold a reference to the current `Task`, cancel it when a new `run()` starts. Apply `AudioProcessor.normalizeRMS()` before transcription. Implement `Core/Pipeline/PipelineFactory.swift` per PRD Section 9.2 — build pipeline from `AppConfig`, instantiating the correct ASREngine and PostProcessor. Write unit tests using MockASREngine and PassthroughPostProcessor.
 

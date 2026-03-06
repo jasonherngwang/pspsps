@@ -29,6 +29,8 @@
 		AAAA000000000000000000C0 /* AudioDeviceManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAAA000000000000000000B0 /* AudioDeviceManager.swift */; };
 		AAAA000000000000000000CB /* WhisperKitEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAAA000000000000000000C9 /* WhisperKitEngine.swift */; };
 		AAAA000000000000000000CC /* ModelDownloadManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAAA000000000000000000CA /* ModelDownloadManager.swift */; };
+		AAAA000000000000000000CF /* test_speech.wav in Resources */ = {isa = PBXBuildFile; fileRef = AAAA000000000000000000CD /* test_speech.wav */; };
+		AAAA000000000000000000D2 /* WhisperKitIntegrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAAA000000000000000000D1 /* WhisperKitIntegrationTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -56,6 +58,8 @@
 		AAAA000000000000000000B0 /* AudioDeviceManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioDeviceManager.swift; sourceTree = "<group>"; };
 		AAAA000000000000000000C9 /* WhisperKitEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WhisperKitEngine.swift; sourceTree = "<group>"; };
 		AAAA000000000000000000CA /* ModelDownloadManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelDownloadManager.swift; sourceTree = "<group>"; };
+		AAAA000000000000000000CD /* test_speech.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = test_speech.wav; sourceTree = "<group>"; };
+		AAAA000000000000000000D1 /* WhisperKitIntegrationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WhisperKitIntegrationTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -108,8 +112,10 @@
 				AAAA00000000000000000020 /* pspspsTests.swift */,
 				AAAA000000000000000000AB /* AppConfigTests.swift */,
 				AAAA000000000000000000AE /* AudioProcessorTests.swift */,
+				AAAA000000000000000000D1 /* WhisperKitIntegrationTests.swift */,
 				AAAA000000000000000000C5 /* Mocks */,
 				AAAA000000000000000000C7 /* Helpers */,
+				AAAA000000000000000000CE /* TestFixtures */,
 			);
 			path = pspspsTests;
 			sourceTree = "<group>";
@@ -178,6 +184,14 @@
 			path = Helpers;
 			sourceTree = "<group>";
 		};
+		AAAA000000000000000000CE /* TestFixtures */ = {
+			isa = PBXGroup;
+			children = (
+				AAAA000000000000000000CD /* test_speech.wav */,
+			);
+			path = TestFixtures;
+			sourceTree = "<group>";
+		};
 		AAAA000000000000000000C8 /* ASR */ = {
 			isa = PBXGroup;
 			children = (
@@ -226,6 +240,7 @@
 			buildPhases = (
 				AAAA00000000000000000043 /* Sources */,
 				AAAA00000000000000000044 /* Frameworks */,
+				AAAA000000000000000000D0 /* Resources */,
 			);
 			buildRules = (
 			);
@@ -305,6 +320,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		AAAA000000000000000000D0 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				AAAA000000000000000000CF /* test_speech.wav in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -339,6 +362,7 @@
 				AAAA000000000000000000BB /* AppConfigTests.swift in Sources */,
 				AAAA000000000000000000BD /* SyntheticAudio.swift in Sources */,
 				AAAA000000000000000000BE /* AudioProcessorTests.swift in Sources */,
+				AAAA000000000000000000D2 /* WhisperKitIntegrationTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
