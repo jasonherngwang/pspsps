@@ -122,16 +122,16 @@ Acceptance criteria:
 
 **Issue 9**
 
-Status: READY
+Status: COMPLETE
 
 Task: Implement `Input/TextPaster.swift` per PRD Section 8.2. Save current pasteboard string, write new text, synthesize Cmd+V via CGEvent (virtual key 0x09 with .maskCommand), restore previous pasteboard after configurable delay (`AppConfig.pasteboardRestoreDelaySeconds`, default 0.3s). Write unit test verifying pasteboard write and restore behavior.
 
 Acceptance criteria:
-- [ ] `xcodebuild build` succeeds
-- [ ] `xcodebuild test` passes: text written to pasteboard matches input
-- [ ] `xcodebuild test` passes: previous pasteboard contents restored after delay
-- [ ] Restore delay reads from AppConfig (default 0.3s)
-- [ ] CGEvent Cmd+V uses correct virtual key code (0x09) and maskCommand flag
+- [x] `xcodebuild build` succeeds
+- [x] `xcodebuild test` passes: text written to pasteboard matches input
+- [x] `xcodebuild test` passes: previous pasteboard contents restored after delay
+- [x] Restore delay reads from AppConfig (default 0.3s)
+- [x] CGEvent Cmd+V uses correct virtual key code (0x09) and maskCommand flag
 
 
 **Issue 10**

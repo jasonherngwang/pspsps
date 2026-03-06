@@ -32,6 +32,8 @@
 		AAAA000000000000000000CF /* test_speech.wav in Resources */ = {isa = PBXBuildFile; fileRef = AAAA000000000000000000CD /* test_speech.wav */; };
 		AAAA000000000000000000D2 /* WhisperKitIntegrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAAA000000000000000000D1 /* WhisperKitIntegrationTests.swift */; };
 		AAAA000000000000000000D4 /* HotkeyManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAAA000000000000000000D3 /* HotkeyManager.swift */; };
+		AAAA000000000000000000D7 /* TextPaster.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAAA000000000000000000D6 /* TextPaster.swift */; };
+		AAAA000000000000000000D9 /* TextPasterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAAA000000000000000000D8 /* TextPasterTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -62,6 +64,8 @@
 		AAAA000000000000000000CD /* test_speech.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = test_speech.wav; sourceTree = "<group>"; };
 		AAAA000000000000000000D1 /* WhisperKitIntegrationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WhisperKitIntegrationTests.swift; sourceTree = "<group>"; };
 		AAAA000000000000000000D3 /* HotkeyManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HotkeyManager.swift; sourceTree = "<group>"; };
+		AAAA000000000000000000D6 /* TextPaster.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextPaster.swift; sourceTree = "<group>"; };
+		AAAA000000000000000000D8 /* TextPasterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextPasterTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -116,6 +120,7 @@
 				AAAA000000000000000000AB /* AppConfigTests.swift */,
 				AAAA000000000000000000AE /* AudioProcessorTests.swift */,
 				AAAA000000000000000000D1 /* WhisperKitIntegrationTests.swift */,
+				AAAA000000000000000000D8 /* TextPasterTests.swift */,
 				AAAA000000000000000000C5 /* Mocks */,
 				AAAA000000000000000000C7 /* Helpers */,
 				AAAA000000000000000000CE /* TestFixtures */,
@@ -208,6 +213,7 @@
 			isa = PBXGroup;
 			children = (
 				AAAA000000000000000000D3 /* HotkeyManager.swift */,
+				AAAA000000000000000000D6 /* TextPaster.swift */,
 			);
 			path = Input;
 			sourceTree = "<group>";
@@ -362,6 +368,7 @@
 				AAAA000000000000000000CB /* WhisperKitEngine.swift in Sources */,
 				AAAA000000000000000000CC /* ModelDownloadManager.swift in Sources */,
 				AAAA000000000000000000D4 /* HotkeyManager.swift in Sources */,
+				AAAA000000000000000000D7 /* TextPaster.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -375,6 +382,7 @@
 				AAAA000000000000000000BD /* SyntheticAudio.swift in Sources */,
 				AAAA000000000000000000BE /* AudioProcessorTests.swift in Sources */,
 				AAAA000000000000000000D2 /* WhisperKitIntegrationTests.swift in Sources */,
+				AAAA000000000000000000D9 /* TextPasterTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
