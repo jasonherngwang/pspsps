@@ -34,6 +34,9 @@
 		AAAA000000000000000000D4 /* HotkeyManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAAA000000000000000000D3 /* HotkeyManager.swift */; };
 		AAAA000000000000000000D7 /* TextPaster.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAAA000000000000000000D6 /* TextPaster.swift */; };
 		AAAA000000000000000000D9 /* TextPasterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAAA000000000000000000D8 /* TextPasterTests.swift */; };
+		AAAA000000000000000000E1 /* TranscriptionPipeline.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAAA000000000000000000E0 /* TranscriptionPipeline.swift */; };
+		AAAA000000000000000000E3 /* PipelineFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAAA000000000000000000E2 /* PipelineFactory.swift */; };
+		AAAA000000000000000000E5 /* TranscriptionPipelineTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAAA000000000000000000E4 /* TranscriptionPipelineTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -66,6 +69,9 @@
 		AAAA000000000000000000D3 /* HotkeyManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HotkeyManager.swift; sourceTree = "<group>"; };
 		AAAA000000000000000000D6 /* TextPaster.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextPaster.swift; sourceTree = "<group>"; };
 		AAAA000000000000000000D8 /* TextPasterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextPasterTests.swift; sourceTree = "<group>"; };
+		AAAA000000000000000000E0 /* TranscriptionPipeline.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TranscriptionPipeline.swift; sourceTree = "<group>"; };
+		AAAA000000000000000000E2 /* PipelineFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PipelineFactory.swift; sourceTree = "<group>"; };
+		AAAA000000000000000000E4 /* TranscriptionPipelineTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TranscriptionPipelineTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -121,6 +127,7 @@
 				AAAA000000000000000000AE /* AudioProcessorTests.swift */,
 				AAAA000000000000000000D1 /* WhisperKitIntegrationTests.swift */,
 				AAAA000000000000000000D8 /* TextPasterTests.swift */,
+				AAAA000000000000000000E4 /* TranscriptionPipelineTests.swift */,
 				AAAA000000000000000000C5 /* Mocks */,
 				AAAA000000000000000000C7 /* Helpers */,
 				AAAA000000000000000000CE /* TestFixtures */,
@@ -133,8 +140,18 @@
 			children = (
 				AAAA000000000000000000C2 /* Protocols */,
 				AAAA000000000000000000C3 /* Models */,
+				AAAA000000000000000000E6 /* Pipeline */,
 			);
 			path = Core;
+			sourceTree = "<group>";
+		};
+		AAAA000000000000000000E6 /* Pipeline */ = {
+			isa = PBXGroup;
+			children = (
+				AAAA000000000000000000E0 /* TranscriptionPipeline.swift */,
+				AAAA000000000000000000E2 /* PipelineFactory.swift */,
+			);
+			path = Pipeline;
 			sourceTree = "<group>";
 		};
 		AAAA000000000000000000C2 /* Protocols */ = {
@@ -369,6 +386,8 @@
 				AAAA000000000000000000CC /* ModelDownloadManager.swift in Sources */,
 				AAAA000000000000000000D4 /* HotkeyManager.swift in Sources */,
 				AAAA000000000000000000D7 /* TextPaster.swift in Sources */,
+				AAAA000000000000000000E1 /* TranscriptionPipeline.swift in Sources */,
+				AAAA000000000000000000E3 /* PipelineFactory.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -383,6 +402,7 @@
 				AAAA000000000000000000BE /* AudioProcessorTests.swift in Sources */,
 				AAAA000000000000000000D2 /* WhisperKitIntegrationTests.swift in Sources */,
 				AAAA000000000000000000D9 /* TextPasterTests.swift in Sources */,
+				AAAA000000000000000000E5 /* TranscriptionPipelineTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -136,21 +136,21 @@ Acceptance criteria:
 
 **Issue 10**
 
-Status: READY
+Status: COMPLETE
 
 Task: Implement `Core/Pipeline/TranscriptionPipeline.swift` per PRD Section 4.3 with cancellation support — hold a reference to the current `Task`, cancel it when a new `run()` starts. Apply `AudioProcessor.normalizeRMS()` before transcription. Implement `Core/Pipeline/PipelineFactory.swift` per PRD Section 9.2 — build pipeline from `AppConfig`, instantiating the correct ASREngine and PostProcessor. Write unit tests using MockASREngine and PassthroughPostProcessor.
 
 Acceptance criteria:
-- [ ] `xcodebuild test` passes: pipeline with MockASREngine + PassthroughPostProcessor returns expected text
-- [ ] `xcodebuild test` passes: calling run() cancels any in-flight previous task
-- [ ] `xcodebuild test` passes: PipelineFactory builds WhisperKitEngine when config.asrEngine == .whisperKit
-- [ ] `xcodebuild test` passes: PipelineFactory builds PassthroughPostProcessor when config.postProcessor == .passthrough
-- [ ] Pipeline calls AudioProcessor.normalizeRMS() before ASREngine.transcribe()
+- [x] `xcodebuild test` passes: pipeline with MockASREngine + PassthroughPostProcessor returns expected text
+- [x] `xcodebuild test` passes: calling run() cancels any in-flight previous task
+- [x] `xcodebuild test` passes: PipelineFactory builds WhisperKitEngine when config.asrEngine == .whisperKit
+- [x] `xcodebuild test` passes: PipelineFactory builds PassthroughPostProcessor when config.postProcessor == .passthrough
+- [x] Pipeline calls AudioProcessor.normalizeRMS() before ASREngine.transcribe()
 
 
 **Issue 11**
 
-Status: BLOCKED by Issue 10
+Status: READY
 
 Task: Wire the complete end-to-end flow in an app coordinator / controller class. On hotkey start → `AudioCaptureManager.startCapture()`. On hotkey stop → `stopCapture()` → `pipeline.run(buffer)` → `TextPaster.paste(result)`. Implement a state machine: `idle → recording → transcribing → idle`. Catch all pipeline errors (log them, do not crash). Connect to the app entry point so the flow is active at launch (with a loaded model).
 
@@ -207,7 +207,7 @@ Acceptance criteria:
 
 **Issue 15**
 
-Status: BLOCKED by Issue 10
+Status: READY
 
 Task: Implement `PostProcessors/OllamaPostProcessor.swift` per PRD Section 6.1. HTTP POST to `{host}/api/chat` with `stream: false`, system prompt (all 6 cleanup rules + all 4 "Do NOT" rules from PRD), and user message format `"Active app: {app}\nTranscript: {text}"`. Parse `response.message.content`. Implement `isAvailable` check via `GET {host}/api/tags` — also verify the configured model name exists in the tags list. On any failure (connection refused, model not found, timeout), fall back to `PassthroughPostProcessor` and log the reason. Write unit tests using a mock `URLProtocol` subclass to intercept HTTP requests.
 
