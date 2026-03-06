@@ -1,0 +1,1 @@
+2026-03-05 Issue 1 COMPLETE: Created pspsps Xcode project. macOS 14.0, Swift 6.0, LSUIElement=true, sandbox disabled, audio input entitlement. WhisperKit resolved at 0.16.0. FluidAudio AVAILABLE — resolved from branch main (3e1ee8e), product FluidAudio added to main target. Both build and build-for-testing pass.
