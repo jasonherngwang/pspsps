@@ -64,17 +64,17 @@ Acceptance criteria:
 
 **Issue 5**
 
-Status: READY
+Status: COMPLETE
 
 Task: Implement `Audio/AudioCaptureManager.swift` wrapping AVAudioEngine, conforming to `AudioInputSource`. On `startCapture()`, start the engine and install a tap on the input node — accumulate buffers internally in an array. On `stopCapture()`, remove the tap, stop the engine, concatenate all accumulated buffers into a single `AVAudioPCMBuffer`, and return it. Output format: 16kHz mono Float32. Implement max recording duration per PRD Section 7.1 — schedule a timer that auto-calls `stopCapture()` after `AppConfig.maxRecordingDurationSeconds`. Implement `Audio/AudioDeviceManager.swift` for CoreAudio device enumeration (list available input devices, select by UID, fall back to system default).
 
 Acceptance criteria:
-- [ ] `xcodebuild build` succeeds
-- [ ] AudioCaptureManager conforms to AudioInputSource protocol
-- [ ] Capture format is 16kHz, mono, 32-bit float
-- [ ] Max duration timer exists and triggers auto-stop
-- [ ] AudioDeviceManager can enumerate system input devices (returns array of device info)
-- [ ] AudioDeviceManager falls back to system default when saved UID not found
+- [x] `xcodebuild build` succeeds
+- [x] AudioCaptureManager conforms to AudioInputSource protocol
+- [x] Capture format is 16kHz, mono, 32-bit float
+- [x] Max duration timer exists and triggers auto-stop
+- [x] AudioDeviceManager can enumerate system input devices (returns array of device info)
+- [x] AudioDeviceManager falls back to system default when saved UID not found
 
 
 **Issue 6**

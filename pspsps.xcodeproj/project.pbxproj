@@ -25,6 +25,8 @@
 		AAAA000000000000000000BC /* AudioProcessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAAA000000000000000000AC /* AudioProcessor.swift */; };
 		AAAA000000000000000000BD /* SyntheticAudio.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAAA000000000000000000AD /* SyntheticAudio.swift */; };
 		AAAA000000000000000000BE /* AudioProcessorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAAA000000000000000000AE /* AudioProcessorTests.swift */; };
+		AAAA000000000000000000BF /* AudioCaptureManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAAA000000000000000000AF /* AudioCaptureManager.swift */; };
+		AAAA000000000000000000C0 /* AudioDeviceManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAAA000000000000000000B0 /* AudioDeviceManager.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -48,6 +50,8 @@
 		AAAA000000000000000000AC /* AudioProcessor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioProcessor.swift; sourceTree = "<group>"; };
 		AAAA000000000000000000AD /* SyntheticAudio.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyntheticAudio.swift; sourceTree = "<group>"; };
 		AAAA000000000000000000AE /* AudioProcessorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioProcessorTests.swift; sourceTree = "<group>"; };
+		AAAA000000000000000000AF /* AudioCaptureManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioCaptureManager.swift; sourceTree = "<group>"; };
+		AAAA000000000000000000B0 /* AudioDeviceManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioDeviceManager.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -155,6 +159,8 @@
 			isa = PBXGroup;
 			children = (
 				AAAA000000000000000000AC /* AudioProcessor.swift */,
+				AAAA000000000000000000AF /* AudioCaptureManager.swift */,
+				AAAA000000000000000000B0 /* AudioDeviceManager.swift */,
 			);
 			path = Audio;
 			sourceTree = "<group>";
@@ -303,6 +309,8 @@
 				AAAA000000000000000000B7 /* PostProcessError.swift in Sources */,
 				AAAA000000000000000000B8 /* PassthroughPostProcessor.swift in Sources */,
 				AAAA000000000000000000BC /* AudioProcessor.swift in Sources */,
+				AAAA000000000000000000BF /* AudioCaptureManager.swift in Sources */,
+				AAAA000000000000000000C0 /* AudioDeviceManager.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
