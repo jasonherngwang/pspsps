@@ -29,8 +29,6 @@ final class SettingsViewModel: ObservableObject {
         self.whisperKitState = coordinator.downloadManager.whisperKitState
         self.parakeetState = coordinator.downloadManager.parakeetState
 
-
-
         coordinator.downloadManager.$whisperKitState
             .receive(on: DispatchQueue.main)
             .sink { [weak self] state in self?.whisperKitState = state }

@@ -29,7 +29,6 @@ final class AudioCaptureManager: AudioInputSource {
     /// Called when the audio input device disconnects while recording.
     var onDeviceDisconnected: (() -> Void)?
 
-    // Removed warmUp() to prevent AVAudioEngine crashes when no nodes are attached.
 
     func startCapture() throws {
         lock.lock()

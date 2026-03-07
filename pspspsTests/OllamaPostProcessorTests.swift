@@ -110,8 +110,7 @@ final class OllamaPostProcessorTests: XCTestCase {
         XCTAssertEqual(messages[1]["role"] as? String, "user")
 
         let userContent = try XCTUnwrap(messages[1]["content"] as? String)
-        XCTAssertTrue(userContent.contains("Active app:"), "User message must include active app")
-        XCTAssertTrue(userContent.contains("Transcript:"), "User message must include transcript label")
+        XCTAssertEqual(userContent, "hello world", "User message should be the raw transcript")
     }
 
     // MARK: - System prompt
@@ -135,20 +134,12 @@ final class OllamaPostProcessorTests: XCTestCase {
 
         let prompt = try XCTUnwrap(capturedSystemPrompt, "System prompt was not captured")
 
-        // 6 cleanup rules
-        XCTAssertTrue(prompt.contains("Fix obvious transcription errors"), "Missing rule 1")
-        XCTAssertTrue(prompt.contains("Fix punctuation and capitalization"), "Missing rule 2")
-        XCTAssertTrue(prompt.contains("Expand common abbreviations"), "Missing rule 3")
-        XCTAssertTrue(prompt.contains("Remove filler words"), "Missing rule 4")
-        XCTAssertTrue(prompt.contains("Correct technical terms"), "Missing rule 5")
-        XCTAssertTrue(prompt.contains("active application"), "Missing rule 6")
-
-        // 4 "Do NOT" rules
-        XCTAssertTrue(prompt.contains("Do NOT"), "Missing Do NOT section")
-        XCTAssertTrue(prompt.contains("Rephrase or rewrite"), "Missing Do NOT rule 1")
-        XCTAssertTrue(prompt.contains("Add words the speaker did not say"), "Missing Do NOT rule 2")
-        XCTAssertTrue(prompt.contains("intentional repetition"), "Missing Do NOT rule 3")
-        XCTAssertTrue(prompt.contains("speaker's meaning"), "Missing Do NOT rule 4")
+        // Current system prompt rules
+        XCTAssertTrue(prompt.contains("Fix punctuation"), "Missing punctuation rule")
+        XCTAssertTrue(prompt.contains("filler words"), "Missing filler words rule")
+        XCTAssertTrue(prompt.contains("Do NOT rephrase"), "Missing Do NOT rephrase rule")
+        XCTAssertTrue(prompt.contains("NEVER refuse"), "Missing NEVER refuse rule")
+        XCTAssertTrue(prompt.contains("Output ONLY"), "Missing output-only rule")
     }
 
     // MARK: - Response parsing

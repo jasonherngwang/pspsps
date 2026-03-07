@@ -1,6 +1,5 @@
 import AppKit
 import AVFoundation
-import Combine
 import OSLog
 
 /// A service to decouple Audio Input responsibilities from the AppCoordinator
@@ -18,13 +17,7 @@ final class AudioService: ObservableObject {
         get { captureManager.onDeviceDisconnected }
         set { captureManager.onDeviceDisconnected = newValue }
     }
-    
-    func startCapture() async throws {
-        try await Task.detached {
-            try self.captureManager.startCapture()
-        }.value
-    }
-    
+
     /// Synchronous variant for use from an already-detached context.
     nonisolated func startCaptureDirect() throws {
         try captureManager.startCapture()

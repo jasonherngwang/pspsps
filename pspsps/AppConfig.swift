@@ -3,7 +3,7 @@ import Foundation
 struct AppConfig: Codable, Sendable, Equatable {
 
     // MARK: - ASR
-    var asrEngine: ASREngineOption = .whisperKit
+    var asrEngine: ASREngineOption = .parakeet
     var whisperKitModel: String = "openai_whisper-large-v3-turbo"
     var parakeetModel: String = "parakeet-tdt-0.6b-v3"
 

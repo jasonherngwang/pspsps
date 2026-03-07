@@ -238,8 +238,11 @@ struct NyanCatView: View {
                 PixelRect(color: catDarkGray, x1: bodyW - 2, y1: bodyH, x2: bodyW - 1, y2: bodyH + 2, s: s)
                     .offset(y: legBounce ? 0 : -s)
 
-                // Pop-Tart outline (black border)
-                PixelRect(color: black, x1: 1, y1: 0, x2: bodyW, y2: bodyH - 1, s: s)
+                // Pop-Tart outline (black border) with pixel-rounded corners
+                PixelRect(color: black, x1: 2, y1: 0, x2: bodyW - 1, y2: 0, s: s)       // top
+                PixelRect(color: black, x1: 2, y1: bodyH - 1, x2: bodyW - 1, y2: bodyH - 1, s: s)  // bottom
+                PixelRect(color: black, x1: 1, y1: 1, x2: 1, y2: bodyH - 2, s: s)       // left
+                PixelRect(color: black, x1: bodyW, y1: 1, x2: bodyW, y2: bodyH - 2, s: s) // right
 
                 // Pop-Tart crust fill
                 PixelRect(color: crustColor, x1: 2, y1: 1, x2: bodyW - 1, y2: bodyH - 2, s: s)
@@ -268,11 +271,10 @@ struct NyanCatView: View {
                 }
 
                 // Cat Head
-                PixelCatHead(s: s, catGray: catGray, catLightGray: catLightGray,
-                             catDarkGray: catDarkGray, cheekPink: cheekPink, nosePink: nosePink)
-                    .offset(x: CGFloat(bodyW - 1) * s, y: 1 * s)
+                PixelCatHead(s: s, catGray: catGray, cheekPink: cheekPink, nosePink: nosePink)
+                    .offset(x: CGFloat(bodyW - 1) * s, y: 0 * s)
             }
-            .frame(width: CGFloat(bodyW + 10) * s, height: CGFloat(bodyH + 3) * s)
+            .frame(width: CGFloat(bodyW + 12) * s, height: CGFloat(bodyH + 3) * s)
             .offset(y: CGFloat(bodyBob))
         }
         .onReceive(timer) { _ in
@@ -353,59 +355,66 @@ struct RainbowTrail: View {
 private struct PixelCatHead: View {
     let s: CGFloat
     let catGray: Color
-    let catLightGray: Color
-    let catDarkGray: Color
     let cheekPink: Color
     let nosePink: Color
 
-    // Head is 10×10 pixel grid; ears extend above
-    private let headW = 10
-    private let headH = 10
+    // 11 pixels wide × 11 tall (rows 0-2 ears, rows 3-10 head)
+    private let headW = 11
+    private let headH = 11
 
     var body: some View {
         ZStack(alignment: .topLeading) {
-            // -- Ears (above head) --
-            // Left ear outline + fill
-            PixelRect(color: .black, x1: 1, y1: 0, x2: 2, y2: 0, s: s)   // top
-            PixelRect(color: .black, x1: 0, y1: 1, x2: 0, y2: 2, s: s)   // left edge
-            PixelRect(color: .black, x1: 3, y1: 1, x2: 3, y2: 2, s: s)   // right edge
-            PixelRect(color: catGray, x1: 1, y1: 1, x2: 2, y2: 2, s: s)  // fill
+            // -- Left ear (tip at row 0, base merges at row 2) --
+            PixelRect(color: .black, x1: 1, y1: 0, x2: 2, y2: 0, s: s)   // tip
+            Pixel(color: .black, px: 0, py: 1, size: s)
+            Pixel(color: catGray, px: 1, py: 1, size: s)
+            Pixel(color: catGray, px: 2, py: 1, size: s)
+            Pixel(color: .black, px: 3, py: 1, size: s)
+            Pixel(color: .black, px: 0, py: 2, size: s)
+            Pixel(color: catGray, px: 1, py: 2, size: s)
+            Pixel(color: catGray, px: 2, py: 2, size: s)
+            Pixel(color: .black, px: 3, py: 2, size: s)
 
-            // Right ear outline + fill
-            PixelRect(color: .black, x1: 7, y1: 0, x2: 8, y2: 0, s: s)
-            PixelRect(color: .black, x1: 6, y1: 1, x2: 6, y2: 2, s: s)
-            PixelRect(color: .black, x1: 9, y1: 1, x2: 9, y2: 2, s: s)
-            PixelRect(color: catGray, x1: 7, y1: 1, x2: 8, y2: 2, s: s)
+            // -- Right ear --
+            PixelRect(color: .black, x1: 8, y1: 0, x2: 9, y2: 0, s: s)
+            Pixel(color: .black, px: 7, py: 1, size: s)
+            Pixel(color: catGray, px: 8, py: 1, size: s)
+            Pixel(color: catGray, px: 9, py: 1, size: s)
+            Pixel(color: .black, px: 10, py: 1, size: s)
+            Pixel(color: .black, px: 7, py: 2, size: s)
+            Pixel(color: catGray, px: 8, py: 2, size: s)
+            Pixel(color: catGray, px: 9, py: 2, size: s)
+            Pixel(color: .black, px: 10, py: 2, size: s)
 
-            // -- Head body --
-            // Black outline
-            PixelRect(color: .black, x1: 0, y1: 3, x2: headW - 1, y2: 3, s: s)      // top
-            PixelRect(color: .black, x1: 0, y1: headH - 1, x2: headW - 1, y2: headH - 1, s: s) // bottom
-            PixelRect(color: .black, x1: 0, y1: 3, x2: 0, y2: headH - 1, s: s)      // left
-            PixelRect(color: .black, x1: headW - 1, y1: 3, x2: headW - 1, y2: headH - 1, s: s)  // right
+            // -- Head outline (rows 3-10) --
+            PixelRect(color: .black, x1: 0, y1: 3, x2: 10, y2: 3, s: s)   // top
+            PixelRect(color: .black, x1: 0, y1: 10, x2: 10, y2: 10, s: s) // bottom
+            PixelRect(color: .black, x1: 0, y1: 3, x2: 0, y2: 10, s: s)   // left
+            PixelRect(color: .black, x1: 10, y1: 3, x2: 10, y2: 10, s: s) // right
 
             // Gray fill
-            PixelRect(color: catGray, x1: 1, y1: 4, x2: headW - 2, y2: headH - 2, s: s)
+            PixelRect(color: catGray, x1: 1, y1: 4, x2: 9, y2: 9, s: s)
 
-            // -- Face features --
-            // Eyes (2×2 black with 1px white highlight)
-            PixelRect(color: .black, x1: 2, y1: 5, x2: 3, y2: 6, s: s)  // left eye
-            Pixel(color: .white, px: 2, py: 5, size: s)                   // left highlight
+            // -- Eyes: white 2×2 with black pupil in bottom-right --
+            // Left eye
+            PixelRect(color: .white, x1: 2, y1: 5, x2: 3, y2: 6, s: s)
+            Pixel(color: .black, px: 3, py: 6, size: s)  // pupil
 
-            PixelRect(color: .black, x1: 6, y1: 5, x2: 7, y2: 6, s: s)  // right eye
-            Pixel(color: .white, px: 6, py: 5, size: s)                   // right highlight
+            // Right eye
+            PixelRect(color: .white, x1: 7, y1: 5, x2: 8, y2: 6, s: s)
+            Pixel(color: .black, px: 8, py: 6, size: s)  // pupil
 
-            // Nose
+            // Nose (pink)
             Pixel(color: nosePink, px: 5, py: 7, size: s)
 
-            // Mouth – "w" shape
+            // Mouth – "w"
             Pixel(color: .black, px: 4, py: 8, size: s)
+            Pixel(color: .black, px: 5, py: 8, size: s)
             Pixel(color: .black, px: 6, py: 8, size: s)
-            Pixel(color: .black, px: 5, py: 7, size: s) // shared with nose bottom
 
             // Cheeks
-            PixelRect(color: cheekPink, x1: 1, y1: 7, x2: 2, y2: 7, s: s)  // left cheek
-            PixelRect(color: cheekPink, x1: 7, y1: 7, x2: 8, y2: 7, s: s)  // right cheek
+            PixelRect(color: cheekPink, x1: 1, y1: 7, x2: 2, y2: 7, s: s)
+            PixelRect(color: cheekPink, x1: 8, y1: 7, x2: 9, y2: 7, s: s)
         }
         .frame(width: CGFloat(headW) * s, height: CGFloat(headH) * s)
     }

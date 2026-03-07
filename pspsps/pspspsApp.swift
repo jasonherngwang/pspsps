@@ -78,13 +78,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             window.center()
             _settingsWindow = window
             window.makeKeyAndOrderFront(nil)
-            NSApp.activate(ignoringOtherApps: true)
+            NSApp.activate()
         }
     }
 
     @objc nonisolated func menuShowHistory() {
         _historyWindow?.makeKeyAndOrderFront(nil)
-        NSApp.activate(ignoringOtherApps: true)
+        NSApp.activate()
     }
 
     private func setupHistoryWindow() {
@@ -123,7 +123,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         window.contentView = NSHostingView(rootView: view)
         window.center()
         window.makeKeyAndOrderFront(nil)
-        NSApp.activate(ignoringOtherApps: true)
+        NSApp.activate()
         onboardingWindow = window
     }
 }

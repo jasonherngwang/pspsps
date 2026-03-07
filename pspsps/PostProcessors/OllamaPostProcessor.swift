@@ -11,7 +11,7 @@ final class OllamaPostProcessor: PostProcessor {
     private var _isAvailable: Bool = false
     var isAvailable: Bool { _isAvailable }
 
-    private static let logger = Logger(subsystem: "com.pspsps", category: "OllamaPostProcessor")
+    private static let logger = Logger(subsystem: "com.pspsps.pspsps", category: "OllamaPostProcessor")
 
     private static let systemPrompt = """
         You are a text cleanup tool. You receive raw speech-to-text output and return a cleaned version.

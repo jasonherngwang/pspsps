@@ -250,7 +250,11 @@ final class AppCoordinator: ObservableObject {
         state = .transcribing
         Task {
             do {
-                let text = try await pipeline.run(buffer: buffer)
+                let text = try await pipeline.run(
+                    buffer: buffer,
+                    activeApp: self.capturedSourceApp,
+                    activeAppBundleID: self.capturedSourceAppBundleID
+                )
                 let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
                 if trimmed.isEmpty {
                     showToast.send("Nothing detected")
@@ -277,12 +281,5 @@ final class AppCoordinator: ObservableObject {
             }
             state = .idle
         }
-    }
-
-    // MARK: - Sound Feedback
-
-    private func playFeedbackSound(_ name: String) {
-        guard config.soundFeedbackEnabled else { return }
-        NSSound(named: NSSound.Name(name))?.play()
     }
 }

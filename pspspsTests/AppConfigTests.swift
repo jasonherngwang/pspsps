@@ -71,8 +71,8 @@ final class AppConfigTests: XCTestCase {
         XCTAssertEqual(config.gainTargetDBFS, -20.0)
         XCTAssertEqual(config.maxRecordingDurationSeconds, 30.0)
         XCTAssertEqual(config.ollamaModel, "qwen3.5:4b")
-        XCTAssertEqual(config.asrEngine, .whisperKit)
-        XCTAssertEqual(config.postProcessor, .ollama)
+        XCTAssertEqual(config.asrEngine, .parakeet)
+        XCTAssertEqual(config.postProcessor, .passthrough)
         XCTAssertEqual(config.hotkeyMode, .pushToTalk)
     }
 
@@ -80,7 +80,7 @@ final class AppConfigTests: XCTestCase {
         let loaded = AppConfig.load(from: defaults)
         XCTAssertEqual(loaded.hotkeyKeyCode, 49)
         XCTAssertEqual(loaded.ollamaModel, "qwen3.5:4b")
-        XCTAssertEqual(loaded.asrEngine, .whisperKit)
+        XCTAssertEqual(loaded.asrEngine, .parakeet)
     }
 
     func testEnumsAreCaseIterable() {

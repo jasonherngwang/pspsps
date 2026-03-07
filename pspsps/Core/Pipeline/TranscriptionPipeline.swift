@@ -20,7 +20,11 @@ final class TranscriptionPipeline {
 
     /// Cancels any in-flight transcription, then normalizes the audio, transcribes,
     /// and post-processes, returning the cleaned transcript text.
-    func run(buffer: AVAudioPCMBuffer) async throws -> String {
+    func run(
+        buffer: AVAudioPCMBuffer,
+        activeApp: String? = nil,
+        activeAppBundleID: String? = nil
+    ) async throws -> String {
         currentTask?.cancel()
 
         let task = Task { [asrEngine, postProcessor, config, buffer] in
@@ -38,8 +42,8 @@ final class TranscriptionPipeline {
             try Task.checkCancellation()
 
             let context = PostProcessContext(
-                activeApp: nil,
-                activeAppBundleID: nil,
+                activeApp: activeApp,
+                activeAppBundleID: activeAppBundleID,
                 previousTranscript: nil,
                 timestamp: Date()
             )

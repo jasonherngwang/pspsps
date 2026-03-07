@@ -7,7 +7,7 @@ struct ASRPickerView: View {
     @EnvironmentObject var downloadManager: ModelDownloadManager
     @EnvironmentObject var coordinator: AppCoordinator
 
-    @State private var selectedEngine: AppConfig.ASREngineOption = .whisperKit
+    @State private var selectedEngine: AppConfig.ASREngineOption = .parakeet
 
     /// Set to false when ParakeetEngine is a stub (FluidAudio did not resolve).
     /// True in this build because FluidAudio resolved successfully.
