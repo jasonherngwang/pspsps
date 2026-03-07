@@ -213,6 +213,10 @@ final class AppCoordinator: ObservableObject {
     }
 
     private func runTranscription(buffer: AVAudioPCMBuffer) {
+        guard buffer.frameLength > 0 else {
+            state = .idle
+            return
+        }
         state = .transcribing
         Task {
             do {
