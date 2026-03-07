@@ -1,7 +1,7 @@
 import AVFoundation
 @testable import pspsps
 
-final class MockASREngine: ASREngine, @unchecked Sendable {
+final class MockASREngine: ASREngine {
     let name = "Mock"
     var isAvailable = true
     var mockResult: String = ""

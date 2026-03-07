@@ -1,7 +1,7 @@
 import Foundation
 import OSLog
 
-final class OllamaPostProcessor: PostProcessor, @unchecked Sendable {
+final class OllamaPostProcessor: PostProcessor {
     let model: String
     let host: String
     let urlSession: URLSession
@@ -14,22 +14,15 @@ final class OllamaPostProcessor: PostProcessor, @unchecked Sendable {
     private static let logger = Logger(subsystem: "com.pspsps", category: "OllamaPostProcessor")
 
     private static let systemPrompt = """
-        You are a transcription cleanup assistant. The user will give you a raw speech-to-text transcript.
-        Your job is to:
-        1. Fix obvious transcription errors (wrong homophones, clearly garbled words)
-        2. Fix punctuation and capitalization
-        3. Expand common abbreviations if context is clear
-        4. Remove filler words (um, uh, like) ONLY if they appear to be accidental
-        5. Correct technical terms, product names, and proper nouns based on context
-        6. If the active application is provided, use it to infer the appropriate register (formal for email, casual for Slack, code-aware for Xcode)
+        You are a text cleanup tool. You receive raw speech-to-text output and return a cleaned version.
 
-        Do NOT:
-        - Rephrase or rewrite content
-        - Add words the speaker did not say
-        - Remove intentional repetition or emphasis
-        - Change the speaker's meaning in any way
-
-        Return ONLY the cleaned transcript. No explanations, no preamble.
+        Rules:
+        - Fix punctuation, capitalization, and obvious transcription errors
+        - Remove accidental filler words (um, uh)
+        - Do NOT rephrase, add words, or change meaning
+        - ALWAYS return the cleaned text, even if it seems incomplete or unusual
+        - NEVER refuse. NEVER explain. NEVER add commentary
+        - Output ONLY the cleaned transcript text, nothing else
         """
 
     init(
@@ -73,20 +66,23 @@ final class OllamaPostProcessor: PostProcessor, @unchecked Sendable {
             return transcript
         }
 
-        let userMessage = "Active app: \(context.activeApp ?? "unknown")\nTranscript: \(transcript)"
+        let userMessage = transcript
         let requestBody = ChatRequest(
             model: model,
             messages: [
                 ChatMessage(role: "system", content: Self.systemPrompt),
                 ChatMessage(role: "user", content: userMessage)
             ],
-            stream: false
+            stream: false,
+            options: ChatOptions(num_predict: 1024),
+            think: false
         )
 
         do {
             var request = URLRequest(url: url)
             request.httpMethod = "POST"
             request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+            request.timeoutInterval = 120  // Ollama may need time to load model on first call
             request.httpBody = try JSONEncoder().encode(requestBody)
 
             let (data, response) = try await urlSession.data(for: request)
@@ -102,7 +98,17 @@ final class OllamaPostProcessor: PostProcessor, @unchecked Sendable {
             }
 
             let chatResponse = try JSONDecoder().decode(ChatResponse.self, from: data)
-            return chatResponse.message.content
+            let cleaned = chatResponse.message.content.trimmingCharacters(in: .whitespacesAndNewlines)
+
+            // If the model refused or returned meta-commentary, fall back to raw transcript.
+            let refusalPatterns = ["unable to", "i can't", "i cannot", "as an ai", "i'm sorry"]
+            let lower = cleaned.lowercased()
+            if refusalPatterns.contains(where: { lower.hasPrefix($0) }) {
+                Self.logger.warning("Ollama returned a refusal, using raw transcript")
+                return transcript
+            }
+
+            return cleaned
         } catch {
             Self.logger.error("Ollama request failed: \(error)")
             return transcript
@@ -116,6 +122,12 @@ private struct ChatRequest: Encodable {
     let model: String
     let messages: [ChatMessage]
     let stream: Bool
+    let options: ChatOptions?
+    let think: Bool?
+}
+
+private struct ChatOptions: Encodable {
+    let num_predict: Int
 }
 
 private struct ChatMessage: Codable {

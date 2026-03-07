@@ -1,7 +1,7 @@
 import AVFoundation
 import WhisperKit
 
-final class WhisperKitEngine: ASREngine, @unchecked Sendable {
+final class WhisperKitEngine: ASREngine {
     let name = "WhisperKit"
     private var whisperKit: WhisperKit?
 

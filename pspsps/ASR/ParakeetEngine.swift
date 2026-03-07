@@ -1,7 +1,7 @@
 import AVFoundation
 import FluidAudio
 
-final class ParakeetEngine: ASREngine, @unchecked Sendable {
+final class ParakeetEngine: ASREngine {
     let name = "Parakeet"
     private var asrManager: AsrManager?
 
