@@ -212,6 +212,7 @@ final class AppCoordinator: ObservableObject {
             await captureTask?.value
             captureTask = nil
             let buffer = audioService.stopCapture()
+            logger.info("stopCapture returned buffer with \(buffer.frameLength) frames")
             runTranscription(buffer: buffer)
         }
     }
