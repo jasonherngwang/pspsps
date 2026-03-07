@@ -321,3 +321,21 @@ Acceptance criteria:
 - [x] Audio recording visual feedback appears instantly (sub-10ms) on hotkey press
 - [x] AppCoordinator no longer directly possesses or manipulates AVAudioEngine
 - [x] MainThread SwiftUI render loops are no longer blocked by hardware spin-ups
+
+**Issue 23 (Aesthetic UI Upgrade)**
+
+Status: COMPLETE
+
+Task: Redesign `RecordingOverlay.swift` from a small top-right red dot to a beautiful, modern Pill situated in the bottom-middle of the screen.
+
+- Implement an animated Siri-like waveform (pulsing bars) during `recording` state.
+- Implement an elegant indeterminate loading animation during `transcribing` state.
+- Use spring animations to fluidly morph the pill's width and height between states (e.g., from a wide pill to a square or circle) and fade elegantly on presentation/dismissal.
+- Use `ultraThinMaterial` or a dark sleek translucent style to achieve a premium aesthetic replacing the rigid red circle.
+
+Acceptance criteria:
+
+- [x] UI is a centered pill, no longer a top-right dot.
+- [x] During recording, shows an animated waveform indicating activity.
+- [x] During transcription, morphs/shows a loading animation.
+- [x] Fades in/out and resizes gracefully using `.spring()`.

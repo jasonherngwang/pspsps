@@ -68,15 +68,8 @@ final class RecordingOverlay {
 
     private func subscribeToToasts(of coordinator: AppCoordinator) {
         coordinator.showToast
-            .sink { [weak self] message in
-                guard let self else { return }
-                if message.isEmpty {
-                    self.dismiss()
-                } else {
-                    self.viewModel.mode = .toast(message)
-                    self.present()
-                    self.scheduleDismiss()
-                }
+            .sink { [weak self] _ in
+                self?.dismiss()
             }
             .store(in: &cancellables)
     }
@@ -85,7 +78,7 @@ final class RecordingOverlay {
         dismissTask?.cancel()
         dismissTask = nil
         guard let panel else { return }
-        positionTopRight(panel)
+        positionTopCenter(panel)
         if !panel.isVisible {
             panel.orderFront(nil)
         }
@@ -107,16 +100,17 @@ final class RecordingOverlay {
         panel?.orderOut(nil)
     }
 
-    private func positionTopRight(_ panel: NSPanel) {
+    private func positionTopCenter(_ panel: NSPanel) {
         guard let screen = NSScreen.main ?? NSScreen.screens.first else { return }
         let visible = screen.visibleFrame
-        let pw: CGFloat = 48
-        let ph: CGFloat = 48
-        let margin: CGFloat = 12
+        let pw: CGFloat = 80
+        let ph: CGFloat = 40
+        let topMargin: CGFloat = 8
+        
         panel.setFrame(
             NSRect(
-                x: visible.maxX - pw - margin,
-                y: visible.maxY - ph - margin,
+                x: visible.midX - (pw / 2),
+                y: visible.maxY - ph - topMargin,
                 width: pw,
                 height: ph
             ),
@@ -130,7 +124,6 @@ final class RecordingOverlay {
 private enum OverlayMode: Equatable {
     case recording
     case transcribing
-    case toast(String)
 }
 
 private final class OverlayViewModel: ObservableObject {
@@ -141,32 +134,55 @@ private final class OverlayViewModel: ObservableObject {
 
 private struct OverlayView: View {
     @ObservedObject var viewModel: OverlayViewModel
-    @State private var pulse = false
 
     var body: some View {
-        Group {
-            switch viewModel.mode {
-            case .recording:
-                Circle()
-                    .fill(.red)
-                    .frame(width: 10, height: 10)
-                    .scaleEffect(pulse ? 1.3 : 1.0)
-                    .opacity(pulse ? 0.7 : 1.0)
-                    .animation(.easeInOut(duration: 0.8).repeatForever(autoreverses: true), value: pulse)
-                    .onAppear { pulse = true }
-                    .onChange(of: viewModel.mode) { _, _ in pulse = false }
-            case .transcribing:
-                ProgressView()
-                    .controlSize(.small)
-            case .toast:
-                Image(systemName: "checkmark")
-                    .font(.system(size: 11, weight: .bold))
-                    .foregroundStyle(.green)
+        ZStack {
+            Group {
+                switch viewModel.mode {
+                case .recording:
+                    RecordingPillContent()
+                        .transition(.opacity)
+                case .transcribing:
+                    TranscribingPillContent()
+                        .transition(.opacity)
+                }
+            }
+            .frame(width: 32, height: 16)
+        }
+        .frame(width: 56, height: 28)
+        .background(.regularMaterial, in: Capsule())
+        .overlay(Capsule().strokeBorder(.white.opacity(0.15), lineWidth: 0.5))
+        .shadow(color: .black.opacity(0.2), radius: 8, y: 4)
+        .animation(.easeInOut(duration: 0.3), value: viewModel.mode)
+    }
+}
+
+private struct RecordingPillContent: View {
+    @State private var peaks: [CGFloat] = [0.3, 0.6, 0.9, 0.5, 0.4]
+    private let timer = Timer.publish(every: 0.15, on: .main, in: .common).autoconnect()
+
+    var body: some View {
+        HStack(spacing: 3) {
+            ForEach(0..<5, id: \.self) { index in
+                Capsule()
+                    .fill(.primary.opacity(0.8))
+                    .frame(width: 2.5, height: 12 * peaks[index])
+                    .animation(.easeInOut(duration: 0.15), value: peaks[index])
             }
         }
-        .frame(width: 36, height: 36)
-        .background(.thickMaterial, in: Circle())
-        .overlay(Circle().strokeBorder(.primary.opacity(0.12), lineWidth: 0.5))
-        .shadow(color: .black.opacity(0.25), radius: 8, y: 2)
+        .frame(height: 12)
+        .onReceive(timer) { _ in
+            for i in 0..<peaks.count {
+                peaks[i] = CGFloat.random(in: 0.2...1.0)
+            }
+        }
+    }
+}
+
+private struct TranscribingPillContent: View {
+    var body: some View {
+        ProgressView()
+            .controlSize(.small)
+            .scaleEffect(0.8)
     }
 }
