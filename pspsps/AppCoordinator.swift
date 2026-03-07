@@ -182,6 +182,7 @@ final class AppCoordinator: ObservableObject {
     }
 
     private var captureTask: Task<Void, Never>?
+    private var stopContinuation: CheckedContinuation<Void, Never>?
 
     private func handleHotkeyStarted() {
         guard state == .idle else { return }
@@ -192,7 +193,20 @@ final class AppCoordinator: ObservableObject {
         
         captureTask = Task {
             do {
-                try await audioService.startCapture()
+                // Start capture synchronously on a background thread
+                try await Task.detached {
+                    try self.audioService.startCaptureDirect()
+                }.value
+                
+                // Wait for the user to release the hotkey
+                await withCheckedContinuation { continuation in
+                    self.stopContinuation = continuation
+                }
+                
+                // Stop capture and transcribe (engine is guaranteed running)
+                let buffer = self.audioService.stopCapture()
+                self.logger.info("stopCapture returned buffer with \(buffer.frameLength) frames")
+                self.runTranscription(buffer: buffer)
             } catch {
                 logger.error("Audio capture failed to start: \(error)")
                 if let ae = error as? AudioCaptureError, ae == .invalidInputFormat {
@@ -207,14 +221,8 @@ final class AppCoordinator: ObservableObject {
 
     private func handleHotkeyStopped() {
         guard state == .recording else { return }
-        Task {
-            // Wait for engine.start() to finish before stopping
-            await captureTask?.value
-            captureTask = nil
-            let buffer = audioService.stopCapture()
-            logger.info("stopCapture returned buffer with \(buffer.frameLength) frames")
-            runTranscription(buffer: buffer)
-        }
+        stopContinuation?.resume()
+        stopContinuation = nil
     }
 
     private func runTranscription(buffer: AVAudioPCMBuffer) {

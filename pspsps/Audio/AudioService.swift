@@ -25,6 +25,11 @@ final class AudioService: ObservableObject {
         }.value
     }
     
+    /// Synchronous variant for use from an already-detached context.
+    func startCaptureDirect() throws {
+        try captureManager.startCapture()
+    }
+    
     func stopCapture() -> AVAudioPCMBuffer {
         return captureManager.stopCapture()
     }
