@@ -9,6 +9,7 @@ APP_PATH=$(xcodebuild -project pspsps.xcodeproj -scheme pspsps -configuration De
 
 echo "Killing existing pspsps..."
 pkill -x pspsps || true
+sleep 1.5
 
 echo "Opening $APP_PATH ..."
 open "$APP_PATH"
