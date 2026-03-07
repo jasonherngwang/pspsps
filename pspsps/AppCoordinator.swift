@@ -168,7 +168,6 @@ final class AppCoordinator: ObservableObject {
 
         audioService.onAutoStop = { [weak self] buffer in
             guard let self else { return }
-            self.playFeedbackSound("Pop")
             self.showToast.send("Max duration reached")
             self.runTranscription(buffer: buffer)
         }
@@ -185,7 +184,6 @@ final class AppCoordinator: ObservableObject {
     private func handleHotkeyStarted() {
         guard state == .idle else { return }
         state = .recording
-        playFeedbackSound("Tink")
         let frontmost = NSWorkspace.shared.frontmostApplication
         capturedSourceApp = frontmost?.localizedName
         capturedSourceAppBundleID = frontmost?.bundleIdentifier
@@ -207,7 +205,6 @@ final class AppCoordinator: ObservableObject {
 
     private func handleHotkeyStopped() {
         guard state == .recording else { return }
-        playFeedbackSound("Pop")
         let buffer = audioService.stopCapture()
         runTranscription(buffer: buffer)
     }
