@@ -103,8 +103,8 @@ final class RecordingOverlay {
     private func positionTopCenter(_ panel: NSPanel) {
         guard let screen = NSScreen.main ?? NSScreen.screens.first else { return }
         let visible = screen.visibleFrame
-        let pw: CGFloat = 80
-        let ph: CGFloat = 40
+        let pw: CGFloat = 160
+        let ph: CGFloat = 60
         let topMargin: CGFloat = 8
         
         panel.setFrame(
@@ -136,53 +136,8 @@ private struct OverlayView: View {
     @ObservedObject var viewModel: OverlayViewModel
 
     var body: some View {
-        ZStack {
-            Group {
-                switch viewModel.mode {
-                case .recording:
-                    RecordingPillContent()
-                        .transition(.opacity)
-                case .transcribing:
-                    TranscribingPillContent()
-                        .transition(.opacity)
-                }
-            }
-            .frame(width: 32, height: 16)
-        }
-        .frame(width: 56, height: 28)
-        .background(.regularMaterial, in: Capsule())
-        .overlay(Capsule().strokeBorder(.white.opacity(0.15), lineWidth: 0.5))
-        .shadow(color: .black.opacity(0.2), radius: 8, y: 4)
-        .animation(.easeInOut(duration: 0.3), value: viewModel.mode)
-    }
-}
-
-private struct RecordingPillContent: View {
-    @State private var peaks: [CGFloat] = [0.3, 0.6, 0.9, 0.5, 0.4]
-    private let timer = Timer.publish(every: 0.15, on: .main, in: .common).autoconnect()
-
-    var body: some View {
-        HStack(spacing: 3) {
-            ForEach(0..<5, id: \.self) { index in
-                Capsule()
-                    .fill(.primary.opacity(0.8))
-                    .frame(width: 2.5, height: 12 * peaks[index])
-                    .animation(.easeInOut(duration: 0.15), value: peaks[index])
-            }
-        }
-        .frame(height: 12)
-        .onReceive(timer) { _ in
-            for i in 0..<peaks.count {
-                peaks[i] = CGFloat.random(in: 0.2...1.0)
-            }
-        }
-    }
-}
-
-private struct TranscribingPillContent: View {
-    var body: some View {
-        ProgressView()
-            .controlSize(.small)
-            .scaleEffect(0.8)
+        NyanCatView(isRecording: viewModel.mode == .recording)
+            .shadow(color: .black.opacity(0.3), radius: 4, y: 2)
+            .animation(.easeInOut(duration: 0.3), value: viewModel.mode)
     }
 }
