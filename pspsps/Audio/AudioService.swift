@@ -26,7 +26,7 @@ final class AudioService: ObservableObject {
     }
     
     /// Synchronous variant for use from an already-detached context.
-    func startCaptureDirect() throws {
+    nonisolated func startCaptureDirect() throws {
         try captureManager.startCapture()
     }
     
