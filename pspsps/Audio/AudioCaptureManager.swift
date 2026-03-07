@@ -29,16 +29,22 @@ final class AudioCaptureManager: AudioInputSource {
     /// Called when the audio input device disconnects while recording.
     var onDeviceDisconnected: (() -> Void)?
 
-    func startCapture() throws {
-        guard !isCapturing else { return }
-        isCapturing = true
+    // Removed warmUp() to prevent AVAudioEngine crashes when no nodes are attached.
 
+    func startCapture() throws {
         lock.lock()
-        accumulatedBuffers = []
-        lock.unlock()
+        defer { lock.unlock() }
+        
+        guard !isCapturing else { return }
 
         let inputNode = engine.inputNode
         let inputFormat = inputNode.outputFormat(forBus: 0)
+        
+        guard inputFormat.channelCount > 0 else {
+            throw AudioCaptureError.invalidInputFormat
+        }
+
+        accumulatedBuffers = []
 
         inputNode.installTap(onBus: 0, bufferSize: 4096, format: inputFormat) { [weak self] buffer, _ in
             guard let self else { return }
@@ -49,7 +55,13 @@ final class AudioCaptureManager: AudioInputSource {
             }
         }
 
-        try engine.start()
+        do {
+            try engine.start()
+            isCapturing = true
+        } catch {
+            inputNode.removeTap(onBus: 0)
+            throw error
+        }
 
         configChangeObserver = NotificationCenter.default.addObserver(
             forName: .AVAudioEngineConfigurationChange,
@@ -71,6 +83,9 @@ final class AudioCaptureManager: AudioInputSource {
 
     @discardableResult
     func stopCapture() -> AVAudioPCMBuffer {
+        lock.lock()
+        defer { lock.unlock() }
+        
         guard isCapturing else {
             return AVAudioPCMBuffer(pcmFormat: outputFormat, frameCapacity: 0)!
         }
@@ -87,10 +102,8 @@ final class AudioCaptureManager: AudioInputSource {
         engine.inputNode.removeTap(onBus: 0)
         engine.stop()
 
-        lock.lock()
         let buffers = accumulatedBuffers
         accumulatedBuffers = []
-        lock.unlock()
 
         return concatenate(buffers)
     }
@@ -140,5 +153,16 @@ final class AudioCaptureManager: AudioInputSource {
             offset += Int(buf.frameLength)
         }
         return combined
+    }
+}
+
+enum AudioCaptureError: Error, LocalizedError {
+    case invalidInputFormat
+    
+    var errorDescription: String? {
+        switch self {
+        case .invalidInputFormat:
+            return "The selected audio input device format is not supported."
+        }
     }
 }

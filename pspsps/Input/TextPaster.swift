@@ -2,7 +2,7 @@ import ApplicationServices
 import Cocoa
 import CoreGraphics
 
-final class TextPaster: @unchecked Sendable {
+final class TextPaster {
 
     /// Writes `text` to the general pasteboard, then synthesizes a Cmd+V keystroke
     /// if Accessibility permission is granted.

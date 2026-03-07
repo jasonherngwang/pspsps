@@ -36,11 +36,11 @@ final class AppCoordinator: ObservableObject {
         didSet { config.save() }
     }
 
-    let hotkeyManager = HotkeyManager()
-    let audioCaptureManager = AudioCaptureManager()
-    let textPaster = TextPaster()
-    let downloadManager = ModelDownloadManager()
-    let transcriptHistory = TranscriptHistory()
+    let audioService: AudioService
+    let shortcutService: ShortcutService
+    let textPaster: TextPaster
+    let downloadManager: ModelDownloadManager
+    let transcriptHistory: TranscriptHistory
     private(set) var pipeline: TranscriptionPipeline
 
     // Frontmost app captured at recording start so it can be stored with the entry.
@@ -65,10 +65,18 @@ final class AppCoordinator: ObservableObject {
         prevHotkeyModifiers = initialConfig.hotkeyModifiers
         prevHotkeyMode     = initialConfig.hotkeyMode
 
-        pipeline = PipelineFactory.build(from: initialConfig)
+        self.audioService = AudioService()
+        self.shortcutService = ShortcutService()
+        self.textPaster = TextPaster()
+        self.downloadManager = ModelDownloadManager()
+        self.transcriptHistory = TranscriptHistory()
+        self.pipeline = PipelineFactory.build(from: initialConfig)
+
         setupCallbacks()
         observeConfigChanges()
-        Task { await self.startup() }
+        if NSClassFromString("XCTestCase") == nil {
+            Task { await self.startup() }
+        }
     }
 
     // MARK: - Pipeline Rebuild
@@ -96,9 +104,7 @@ final class AppCoordinator: ObservableObject {
             .dropFirst()
             .receive(on: DispatchQueue.main)
             .sink { [weak self] newConfig in
-                MainActor.assumeIsolated {
-                    self?.handleConfigChange(to: newConfig)
-                }
+                self?.handleConfigChange(to: newConfig)
             }
             .store(in: &cancellables)
     }
@@ -128,7 +134,9 @@ final class AppCoordinator: ObservableObject {
     }
 
     private func startup() async {
-        checkMicrophonePermission()
+        audioService.checkMicrophonePermission(onDenied: { [weak self] in
+            self?.showToast.send("Microphone access denied — open System Settings")
+        })
         do {
             try await pipeline.asrEngine.loadModel()
             modelNotLoaded = false
@@ -140,24 +148,16 @@ final class AppCoordinator: ObservableObject {
     }
 
     private func startHotkeyListening() {
-        do {
-            try hotkeyManager.startListening(
-                keyCode: config.hotkeyKeyCode,
-                modifiers: CGEventFlags(rawValue: config.hotkeyModifiers),
-                mode: config.hotkeyMode
-            )
-            accessibilityNotGranted = false
-        } catch HotkeyManagerError.accessibilityNotGranted {
-            accessibilityNotGranted = true
-            logger.warning("Accessibility permission not granted — hotkey disabled")
-        } catch {
-            logger.error("Hotkey listener failed to start: \(error)")
-        }
+        shortcutService.startListening(config: config, onPermissionDenied: { [weak self] in
+            self?.accessibilityNotGranted = true
+        })
+        accessibilityNotGranted = false
     }
 
     private func setupCallbacks() {
-        hotkeyManager.onHotkeyEvent = { [weak self] event in
-            MainActor.assumeIsolated {
+        shortcutService.onHotkeyEvent = { [weak self] event in
+            // Dispatch via Task so @MainActor code runs with proper executor context.
+            Task { @MainActor [weak self] in
                 guard let self else { return }
                 switch event {
                 case .started: self.handleHotkeyStarted()
@@ -166,44 +166,49 @@ final class AppCoordinator: ObservableObject {
             }
         }
 
-        audioCaptureManager.onAutoStop = { [weak self] buffer in
-            MainActor.assumeIsolated {
-                guard let self else { return }
-                self.playFeedbackSound("Pop")
-                self.showToast.send("Max duration reached")
-                self.runTranscription(buffer: buffer)
-            }
+        audioService.onAutoStop = { [weak self] buffer in
+            guard let self else { return }
+            self.playFeedbackSound("Pop")
+            self.showToast.send("Max duration reached")
+            self.runTranscription(buffer: buffer)
         }
 
-        audioCaptureManager.onDeviceDisconnected = { [weak self] in
-            MainActor.assumeIsolated {
-                guard let self else { return }
-                if self.state == .recording {
-                    self.showToast.send("Audio device disconnected")
-                    self.state = .idle
-                }
+        audioService.onDeviceDisconnected = { [weak self] in
+            guard let self else { return }
+            if self.state == .recording {
+                self.showToast.send("Audio device disconnected")
+                self.state = .idle
             }
         }
     }
 
     private func handleHotkeyStarted() {
         guard state == .idle else { return }
+        state = .recording
+        playFeedbackSound("Tink")
         let frontmost = NSWorkspace.shared.frontmostApplication
         capturedSourceApp = frontmost?.localizedName
         capturedSourceAppBundleID = frontmost?.bundleIdentifier
-        do {
-            try audioCaptureManager.startCapture()
-            state = .recording
-            playFeedbackSound("Tink")
-        } catch {
-            logger.error("Audio capture failed to start: \(error)")
+        
+        Task {
+            do {
+                try await audioService.startCapture()
+            } catch {
+                logger.error("Audio capture failed to start: \(error)")
+                if let ae = error as? AudioCaptureError, ae == .invalidInputFormat {
+                    showToast.send("Invalid audio format")
+                } else {
+                    showToast.send("Capture error")
+                }
+                state = .idle
+            }
         }
     }
 
     private func handleHotkeyStopped() {
         guard state == .recording else { return }
         playFeedbackSound("Pop")
-        let buffer = audioCaptureManager.stopCapture()
+        let buffer = audioService.stopCapture()
         runTranscription(buffer: buffer)
     }
 
@@ -245,17 +250,5 @@ final class AppCoordinator: ObservableObject {
     private func playFeedbackSound(_ name: String) {
         guard config.soundFeedbackEnabled else { return }
         NSSound(named: NSSound.Name(name))?.play()
-    }
-
-    // MARK: - Permissions
-
-    private func checkMicrophonePermission() {
-        switch AVCaptureDevice.authorizationStatus(for: .audio) {
-        case .denied, .restricted:
-            logger.warning("Microphone access denied — recording will not work")
-            showToast.send("Microphone access denied — open System Settings")
-        default:
-            break
-        }
     }
 }

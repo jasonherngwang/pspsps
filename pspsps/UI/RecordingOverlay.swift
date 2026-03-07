@@ -2,10 +2,10 @@ import AppKit
 import Combine
 import SwiftUI
 
-/// Floating status panel showing recording/transcribing state.
+/// Floating status pill showing recording/transcribing state.
 ///
 /// Uses `.nonactivatingPanel` so it never steals focus from the active app.
-/// Positioned at the bottom-centre of the main screen and auto-dismisses
+/// Positioned at the top-right of the main screen and auto-dismisses
 /// after `AppConfig.overlayDurationSeconds`.
 @MainActor
 final class RecordingOverlay {
@@ -26,7 +26,7 @@ final class RecordingOverlay {
 
     private func makePanel() -> NSPanel {
         let panel = NSPanel(
-            contentRect: NSRect(x: 0, y: 0, width: 320, height: 56),
+            contentRect: .zero,
             styleMask: [.nonactivatingPanel, .fullSizeContentView, .borderless],
             backing: .buffered,
             defer: false
@@ -37,7 +37,10 @@ final class RecordingOverlay {
         panel.backgroundColor = .clear
         panel.hasShadow = false
         panel.ignoresMouseEvents = true
-        panel.contentViewController = NSHostingController(rootView: OverlayView(viewModel: viewModel))
+        let hostingController = NSHostingController(rootView: OverlayView(viewModel: viewModel))
+        hostingController.view.wantsLayer = true
+        hostingController.view.layer?.backgroundColor = .clear
+        panel.contentViewController = hostingController
         return panel
     }
 
@@ -48,12 +51,12 @@ final class RecordingOverlay {
                 guard let self else { return }
                 switch newState {
                 case .recording:
-                    self.present(text: "Recording...")
+                    self.viewModel.mode = .recording
+                    self.present()
                 case .transcribing:
-                    self.present(text: "Transcribing...")
+                    self.viewModel.mode = .transcribing
+                    self.present()
                 case .idle:
-                    // If coming from recording (not transcribing), dismiss immediately.
-                    // Transcribing→idle is handled by the toast subscription below.
                     if self.previousState != .transcribing {
                         self.dismiss()
                     }
@@ -64,29 +67,25 @@ final class RecordingOverlay {
     }
 
     private func subscribeToToasts(of coordinator: AppCoordinator) {
-        // showToast delivers synchronously from @MainActor, so ordering is preserved:
-        // coordinator fires showToast BEFORE setting state = .idle, so the toast is
-        // shown first. The state → .idle delivery (async via receive(on:)) arrives later
-        // but is ignored for the transcribing→idle path.
         coordinator.showToast
             .sink { [weak self] message in
                 guard let self else { return }
                 if message.isEmpty {
                     self.dismiss()
                 } else {
-                    self.present(text: message)
+                    self.viewModel.mode = .toast(message)
+                    self.present()
                     self.scheduleDismiss()
                 }
             }
             .store(in: &cancellables)
     }
 
-    private func present(text: String) {
+    private func present() {
         dismissTask?.cancel()
         dismissTask = nil
-        viewModel.text = text
         guard let panel else { return }
-        positionAtBottomCenter(panel)
+        positionTopRight(panel)
         if !panel.isVisible {
             panel.orderFront(nil)
         }
@@ -108,13 +107,19 @@ final class RecordingOverlay {
         panel?.orderOut(nil)
     }
 
-    private func positionAtBottomCenter(_ panel: NSPanel) {
+    private func positionTopRight(_ panel: NSPanel) {
         guard let screen = NSScreen.main ?? NSScreen.screens.first else { return }
         let visible = screen.visibleFrame
-        let pw: CGFloat = 320
-        let ph: CGFloat = 56
+        let pw: CGFloat = 48
+        let ph: CGFloat = 48
+        let margin: CGFloat = 12
         panel.setFrame(
-            NSRect(x: visible.midX - pw / 2, y: visible.minY + 40, width: pw, height: ph),
+            NSRect(
+                x: visible.maxX - pw - margin,
+                y: visible.maxY - ph - margin,
+                width: pw,
+                height: ph
+            ),
             display: false
         )
     }
@@ -122,36 +127,46 @@ final class RecordingOverlay {
 
 // MARK: - ViewModel
 
+private enum OverlayMode: Equatable {
+    case recording
+    case transcribing
+    case toast(String)
+}
+
 private final class OverlayViewModel: ObservableObject {
-    @Published var text: String = ""
+    @Published var mode: OverlayMode = .recording
 }
 
 // MARK: - View
 
 private struct OverlayView: View {
     @ObservedObject var viewModel: OverlayViewModel
+    @State private var pulse = false
 
     var body: some View {
-        HStack(spacing: 8) {
-            if viewModel.text == "Recording..." {
+        Group {
+            switch viewModel.mode {
+            case .recording:
                 Circle()
-                    .fill(Color.red)
-                    .frame(width: 7, height: 7)
+                    .fill(.red)
+                    .frame(width: 10, height: 10)
+                    .scaleEffect(pulse ? 1.3 : 1.0)
+                    .opacity(pulse ? 0.7 : 1.0)
+                    .animation(.easeInOut(duration: 0.8).repeatForever(autoreverses: true), value: pulse)
+                    .onAppear { pulse = true }
+                    .onChange(of: viewModel.mode) { _, _ in pulse = false }
+            case .transcribing:
+                ProgressView()
+                    .controlSize(.small)
+            case .toast:
+                Image(systemName: "checkmark")
+                    .font(.system(size: 11, weight: .bold))
+                    .foregroundStyle(.green)
             }
-            Text(viewModel.text)
-                .font(.system(size: 13, weight: .medium))
-                .foregroundStyle(.primary)
-                .lineLimit(1)
-                .truncationMode(.tail)
         }
-        .padding(.horizontal, 14)
-        .padding(.vertical, 9)
-        .frame(maxWidth: .infinity)
-        .background(
-            RoundedRectangle(cornerRadius: 12, style: .continuous)
-                .fill(.regularMaterial)
-                .shadow(color: .black.opacity(0.2), radius: 8, y: 4)
-        )
-        .padding(8)
+        .frame(width: 36, height: 36)
+        .background(.thickMaterial, in: Circle())
+        .overlay(Circle().strokeBorder(.primary.opacity(0.12), lineWidth: 0.5))
+        .shadow(color: .black.opacity(0.25), radius: 8, y: 2)
     }
 }

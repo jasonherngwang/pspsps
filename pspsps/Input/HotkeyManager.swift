@@ -1,59 +1,55 @@
-import Cocoa
+@preconcurrency import Cocoa
 import ApplicationServices
+import OSLog
 
 enum HotkeyEvent: Sendable {
     case started
     case stopped
 }
 
-enum HotkeyManagerError: Error {
-    case accessibilityNotGranted
-    case tapCreationFailed
-}
+private let logger = Logger(subsystem: "com.pspsps.pspsps", category: "HotkeyManager")
 
+/// Manages a CGEvent tap for global hotkey detection.
+///
+/// Not @MainActor — uses nonisolated(unsafe) storage so the C callback can access
+/// state directly without MainActor.assumeIsolated (which can crash on macOS 26
+/// due to null-executor dereference in swift_task_isCurrentExecutorWithFlagsImpl).
+/// All mutations happen on the main thread; the C callback runs on the main RunLoop.
 final class HotkeyManager: @unchecked Sendable {
 
-    var onHotkeyEvent: ((HotkeyEvent) -> Void)?
+    nonisolated(unsafe) var onHotkeyEvent: ((HotkeyEvent) -> Void)?
 
-    private var configKeyCode: UInt16 = 0
-    private var configModifiers: CGEventFlags = []
-    private var configMode: AppConfig.HotkeyMode = .pushToTalk
-    private var isToggleActive = false
+    nonisolated(unsafe) private var configKeyCode: UInt16 = 0
+    nonisolated(unsafe) private var configModifiers: CGEventFlags = []
+    nonisolated(unsafe) private var configMode: AppConfig.HotkeyMode = .pushToTalk
+    nonisolated(unsafe) private var isToggleActive = false
 
-    private var eventTap: CFMachPort?
-    private var runLoopSource: CFRunLoopSource?
-
-    private static let relevantModifiers: CGEventFlags = [
-        .maskShift, .maskControl, .maskAlternate, .maskCommand,
-    ]
-
-    deinit {
-        stopListening()
-    }
+    nonisolated(unsafe) private var eventTap: CFMachPort?
+    nonisolated(unsafe) private var runLoopSource: CFRunLoopSource?
+    nonisolated(unsafe) private var tapContext: TapContext?
 
     // MARK: - Public API
-
-    func isPermissionGranted() -> Bool {
-        AXIsProcessTrusted()
-    }
 
     func startListening(
         keyCode: UInt16,
         modifiers: CGEventFlags,
         mode: AppConfig.HotkeyMode
     ) throws {
-        guard AXIsProcessTrusted() else {
-            throw HotkeyManagerError.accessibilityNotGranted
-        }
-
         stopListening()
 
         configKeyCode = keyCode
-        configModifiers = modifiers.intersection(HotkeyManager.relevantModifiers)
+        configModifiers = modifiers
         configMode = mode
         isToggleActive = false
 
-        let selfPtr = Unmanaged.passUnretained(self).toOpaque()
+        guard AXIsProcessTrusted() else {
+            logger.warning("Accessibility not granted")
+            throw HotkeyManagerError.accessibilityNotGranted
+        }
+
+        let context = TapContext(manager: self)
+        let contextPtr = Unmanaged.passRetained(context).toOpaque()
+
         let eventMask: CGEventMask =
             (1 << CGEventType.keyDown.rawValue) | (1 << CGEventType.keyUp.rawValue)
 
@@ -63,16 +59,20 @@ final class HotkeyManager: @unchecked Sendable {
             options: .defaultTap,
             eventsOfInterest: eventMask,
             callback: hotkeyManagerEventTapCallback,
-            userInfo: selfPtr
+            userInfo: contextPtr
         ) else {
+            Unmanaged<TapContext>.fromOpaque(contextPtr).release()
+            logger.error("CGEvent tap creation failed")
             throw HotkeyManagerError.tapCreationFailed
         }
 
+        tapContext = context
         eventTap = tap
         let source = CFMachPortCreateRunLoopSource(kCFAllocatorDefault, tap, 0)
         runLoopSource = source
         CFRunLoopAddSource(CFRunLoopGetMain(), source, .commonModes)
         CGEvent.tapEnable(tap: tap, enable: true)
+        logger.notice("Hotkey listening started: keyCode=\(keyCode), modifiers=\(modifiers.rawValue)")
     }
 
     func stopListening() {
@@ -84,15 +84,15 @@ final class HotkeyManager: @unchecked Sendable {
         }
         eventTap = nil
         runLoopSource = nil
+        tapContext = nil
     }
 
-    // MARK: - Event handling (called from the C callback on the main runloop)
+    // MARK: - CGEvent Handling (called directly from C callback, no actor context needed)
 
     fileprivate func handleRawEvent(
         type: CGEventType,
         event: CGEvent
     ) -> Unmanaged<CGEvent>? {
-        // Re-enable the tap if macOS disabled it due to timeout or user input.
         if type == .tapDisabledByTimeout || type == .tapDisabledByUserInput {
             if let tap = eventTap {
                 CGEvent.tapEnable(tap: tap, enable: true)
@@ -104,19 +104,17 @@ final class HotkeyManager: @unchecked Sendable {
             return Unmanaged.passUnretained(event)
         }
 
-        // Match key code.
         let eventKeyCode = UInt16(event.getIntegerValueField(.keyboardEventKeycode))
         guard eventKeyCode == configKeyCode else {
             return Unmanaged.passUnretained(event)
         }
 
-        // Match modifiers (only the modifier keys we care about).
-        let eventModifiers = event.flags.intersection(HotkeyManager.relevantModifiers)
-        guard eventModifiers == configModifiers else {
+        let maskedEvent = event.flags.intersection([.maskShift, .maskControl, .maskAlternate, .maskCommand])
+        let maskedConfig = configModifiers.intersection([.maskShift, .maskControl, .maskAlternate, .maskCommand])
+        guard maskedEvent == maskedConfig else {
             return Unmanaged.passUnretained(event)
         }
 
-        // Ignore key-repeat events so PTT/toggle don't fire repeatedly while held.
         let isRepeat = event.getIntegerValueField(.keyboardEventAutorepeat) != 0
 
         switch configMode {
@@ -133,15 +131,32 @@ final class HotkeyManager: @unchecked Sendable {
             }
         }
 
-        // Return nil to consume the event (prevent the foreground app from seeing it).
         return nil
     }
 }
 
-// MARK: - C callback (free function required by CGEvent.tapCreate)
+// MARK: - Error
+
+enum HotkeyManagerError: Error {
+    case accessibilityNotGranted
+    case tapCreationFailed
+}
+
+// MARK: - Safe ref wrapper for C callback
+
+private final class TapContext {
+    weak var manager: HotkeyManager?
+    init(manager: HotkeyManager) { self.manager = manager }
+}
+
+// MARK: - C callback (runs on main thread via CFRunLoopGetMain)
+// Does NOT use MainActor.assumeIsolated — that can crash on macOS 26 (Tahoe)
+// when swift_task_isCurrentExecutorWithFlagsImpl dereferences a null executor.
+// Instead, onHotkeyEvent dispatches @MainActor work via Task.
 
 private let hotkeyManagerEventTapCallback: CGEventTapCallBack = { _, type, event, userInfo in
     guard let userInfo else { return Unmanaged.passUnretained(event) }
-    let manager = Unmanaged<HotkeyManager>.fromOpaque(userInfo).takeUnretainedValue()
+    let context = Unmanaged<TapContext>.fromOpaque(userInfo).takeUnretainedValue()
+    guard let manager = context.manager else { return Unmanaged.passUnretained(event) }
     return manager.handleRawEvent(type: type, event: event)
 }

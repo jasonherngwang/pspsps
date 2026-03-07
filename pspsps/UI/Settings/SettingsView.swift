@@ -1,78 +1,94 @@
 import AVFoundation
 import AppKit
-import Combine
 import ServiceManagement
 import SwiftUI
 
 // MARK: - Main Settings View
 
 struct SettingsView: View {
+    @ObservedObject var vm: SettingsViewModel
+
     var body: some View {
-        TabView {
-            GeneralSettingsTab()
-                .tabItem { Label("General", systemImage: "gearshape") }
-            ASREngineSettingsTab()
-                .tabItem { Label("ASR Engine", systemImage: "waveform") }
-            PostProcessingSettingsTab()
-                .tabItem { Label("Post-Processing", systemImage: "sparkles") }
-            AudioSettingsTab()
-                .tabItem { Label("Audio", systemImage: "mic") }
-            HistorySettingsTab()
-                .tabItem { Label("History", systemImage: "clock") }
+        ScrollView {
+            VStack(alignment: .leading, spacing: 0) {
+                GeneralSection(vm: vm)
+                Divider().padding(.vertical, 12)
+                ASREngineSection(vm: vm)
+                Divider().padding(.vertical, 12)
+                PostProcessingSection(vm: vm)
+                Divider().padding(.vertical, 12)
+                AudioSection(vm: vm)
+                Divider().padding(.vertical, 12)
+                HistorySection(vm: vm)
+            }
+            .padding(24)
         }
-        .frame(minWidth: 540, minHeight: 440)
+        .frame(minWidth: 500, minHeight: 480)
     }
 }
 
-// MARK: - General Tab
+// MARK: - General
 
-struct GeneralSettingsTab: View {
-    @EnvironmentObject var coordinator: AppCoordinator
+private struct GeneralSection: View {
+    @ObservedObject var vm: SettingsViewModel
     @State private var isRecordingHotkey = false
-    @StateObject private var hotkeyMonitor = HotkeyEventMonitor()
+    @State private var hotkeyMonitor = HotkeyEventMonitor()
 
     var body: some View {
-        Form {
-            Section("Hotkey") {
-                LabeledContent("Shortcut") {
-                    Button(isRecordingHotkey ? "Press any key…" : formattedHotkey) {
-                        if isRecordingHotkey {
-                            stopHotkeyRecording()
-                        } else {
-                            startHotkeyRecording()
-                        }
-                    }
+        VStack(alignment: .leading, spacing: 12) {
+            Text("General").font(.headline)
+
+            HStack {
+                Text("Shortcut")
+                Spacer()
+                Text(isRecordingHotkey ? "Press any key…" : formattedHotkey)
                     .foregroundStyle(isRecordingHotkey ? .red : .primary)
-                    .buttonStyle(.bordered)
-                    .onDisappear { stopHotkeyRecording() }
-                }
-                Picker("Mode", selection: $coordinator.config.hotkeyMode) {
+                    .padding(.horizontal, 10).padding(.vertical, 4)
+                    .background(Color.secondary.opacity(0.15))
+                    .clipShape(RoundedRectangle(cornerRadius: 5))
+                    .contentShape(Rectangle())
+                    .onTapGesture {
+                        if isRecordingHotkey { stopHotkeyRecording() }
+                        else { startHotkeyRecording() }
+                    }
+            }
+            .onDisappear { stopHotkeyRecording() }
+
+            HStack {
+                Text("Mode")
+                Spacer()
+                HStack(spacing: 4) {
                     ForEach(AppConfig.HotkeyMode.allCases, id: \.self) { mode in
-                        Text(mode.rawValue).tag(mode)
+                        Text(mode.rawValue)
+                            .font(.subheadline)
+                            .padding(.horizontal, 8).padding(.vertical, 3)
+                            .background(vm.config.hotkeyMode == mode
+                                ? Color.accentColor.opacity(0.2)
+                                : Color.secondary.opacity(0.12))
+                            .clipShape(RoundedRectangle(cornerRadius: 4))
+                            .contentShape(Rectangle())
+                            .onTapGesture { vm.config.hotkeyMode = mode }
                     }
                 }
-                .pickerStyle(.radioGroup)
             }
 
-            Section("Behavior") {
-                LaunchAtLoginToggle()
-                Toggle("Sound feedback on recording start/stop",
-                       isOn: $coordinator.config.soundFeedbackEnabled)
-            }
+            LaunchAtLoginToggle()
+
+            CheckRow(label: "Sound feedback on recording start/stop",
+                     isOn: $vm.config.soundFeedbackEnabled)
         }
-        .formStyle(.grouped)
     }
 
     private var formattedHotkey: String {
-        formatHotkey(keyCode: coordinator.config.hotkeyKeyCode,
-                     modifiers: coordinator.config.hotkeyModifiers)
+        formatHotkey(keyCode: vm.config.hotkeyKeyCode,
+                     modifiers: vm.config.hotkeyModifiers)
     }
 
     private func startHotkeyRecording() {
         isRecordingHotkey = true
         hotkeyMonitor.start { keyCode, modifiers in
-            coordinator.config.hotkeyKeyCode = keyCode
-            coordinator.config.hotkeyModifiers = modifiers
+            vm.config.hotkeyKeyCode = keyCode
+            vm.config.hotkeyModifiers = modifiers
             isRecordingHotkey = false
         }
     }
@@ -110,18 +126,16 @@ struct GeneralSettingsTab: View {
 
 // MARK: - Hotkey Event Monitor
 
-final class HotkeyEventMonitor: ObservableObject, @unchecked Sendable {
+final class HotkeyEventMonitor {
     private var monitor: Any?
 
-    func start(onCapture: @escaping @MainActor (UInt16, UInt64) -> Void) {
+    func start(onCapture: @escaping (UInt16, UInt64) -> Void) {
         stop()
         monitor = NSEvent.addLocalMonitorForEvents(matching: .keyDown) { event in
             let kc = event.keyCode
             let mods = UInt64(event.modifierFlags
                 .intersection([.shift, .control, .option, .command]).rawValue)
-            Task { @MainActor in
-                onCapture(kc, mods)
-            }
+            onCapture(kc, mods)
             return nil
         }
     }
@@ -138,52 +152,52 @@ final class HotkeyEventMonitor: ObservableObject, @unchecked Sendable {
 
 // MARK: - Launch at Login
 
-struct LaunchAtLoginToggle: View {
+private struct LaunchAtLoginToggle: View {
     @State private var enabled = SMAppService.mainApp.status == .enabled
 
     var body: some View {
-        Toggle("Launch at login", isOn: $enabled)
-            .onChange(of: enabled) { _, newValue in
+        let binding = Binding<Bool>(
+            get: { enabled },
+            set: { newValue in
+                enabled = newValue
                 do {
-                    if newValue {
-                        try SMAppService.mainApp.register()
-                    } else {
-                        try SMAppService.mainApp.unregister()
-                    }
+                    if newValue { try SMAppService.mainApp.register() }
+                    else { try SMAppService.mainApp.unregister() }
                 } catch {
-                    enabled = !newValue
+                    Task { @MainActor in
+                        enabled = SMAppService.mainApp.status == .enabled
+                    }
                 }
             }
+        )
+        Toggle("Launch at login", isOn: binding)
     }
 }
 
-// MARK: - ASR Engine Tab
+// MARK: - ASR Engine
 
-struct ASREngineSettingsTab: View {
-    @EnvironmentObject var coordinator: AppCoordinator
-    @EnvironmentObject var downloadManager: ModelDownloadManager
+private struct ASREngineSection: View {
+    @ObservedObject var vm: SettingsViewModel
 
     var body: some View {
-        Form {
-            Section {
-                engineRow(
-                    engine: .whisperKit,
-                    state: downloadManager.whisperKitState,
-                    title: "WhisperKit (large-v3-turbo)",
-                    subtitle: "~600 MB · ~0.45s latency · Best for whispers, accents, noise",
-                    isRecommended: true
-                )
-                Divider()
-                engineRow(
-                    engine: .parakeet,
-                    state: downloadManager.parakeetState,
-                    title: "Parakeet TDT v3",
-                    subtitle: "~480 MB · ~0.19s latency · Best for clear speech, speed",
-                    isRecommended: false
-                )
-            }
+        VStack(alignment: .leading, spacing: 12) {
+            Text("ASR Engine").font(.headline)
+
+            engineRow(
+                engine: .whisperKit,
+                state: vm.whisperKitState,
+                title: "WhisperKit (large-v3-turbo)",
+                subtitle: "~600 MB · ~0.45s latency · Best for whispers, accents, noise",
+                isRecommended: true
+            )
+            engineRow(
+                engine: .parakeet,
+                state: vm.parakeetState,
+                title: "Parakeet TDT v3",
+                subtitle: "~480 MB · ~0.19s latency · Best for clear speech, speed",
+                isRecommended: false
+            )
         }
-        .formStyle(.grouped)
     }
 
     @ViewBuilder
@@ -195,9 +209,9 @@ struct ASREngineSettingsTab: View {
         isRecommended: Bool
     ) -> some View {
         HStack(alignment: .top, spacing: 12) {
-            VStack(alignment: .leading, spacing: 6) {
+            VStack(alignment: .leading, spacing: 4) {
                 HStack(spacing: 6) {
-                    Text(title).font(.headline)
+                    Text(title).font(.subheadline).bold()
                     if isRecommended {
                         Text("Recommended")
                             .font(.caption2).bold()
@@ -206,23 +220,21 @@ struct ASREngineSettingsTab: View {
                             .foregroundStyle(.blue)
                             .clipShape(Capsule())
                     }
+                    if vm.config.asrEngine == engine {
+                        Text("Active")
+                            .foregroundStyle(.green)
+                            .font(.caption)
+                    }
                 }
-                Text(subtitle)
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
+                Text(subtitle).font(.caption).foregroundStyle(.secondary)
                 stateLabel(state: state)
             }
             Spacer()
-            VStack(alignment: .trailing, spacing: 8) {
-                if coordinator.config.asrEngine == engine {
-                    Label("Active", systemImage: "checkmark.circle.fill")
-                        .foregroundStyle(.green)
-                        .font(.caption)
-                }
-                actionButtons(engine: engine, state: state)
-            }
+            actionButtons(engine: engine, state: state)
         }
-        .padding(.vertical, 4)
+        .padding(10)
+        .background(.quaternary.opacity(0.5))
+        .clipShape(RoundedRectangle(cornerRadius: 8))
     }
 
     @ViewBuilder
@@ -231,8 +243,8 @@ struct ASREngineSettingsTab: View {
         case .notDownloaded:
             Text("Not downloaded").font(.caption).foregroundStyle(.secondary)
         case .downloading(let progress):
-            VStack(alignment: .leading, spacing: 2) {
-                ProgressView(value: progress).frame(maxWidth: 180)
+            HStack(spacing: 8) {
+                ProgressView(value: progress).frame(maxWidth: 120)
                 Text("\(Int(progress * 100))%").font(.caption2).foregroundStyle(.secondary)
             }
         case .downloaded:
@@ -249,29 +261,25 @@ struct ASREngineSettingsTab: View {
     ) -> some View {
         switch state {
         case .notDownloaded, .failed:
-            Button("Download") {
-                Task {
-                    switch engine {
-                    case .whisperKit: await downloadManager.downloadWhisperKit()
-                    case .parakeet:   await downloadManager.downloadParakeet()
-                    }
+            TapButton(title: "Download") {
+                switch engine {
+                case .whisperKit: vm.downloadWhisperKit()
+                case .parakeet:   vm.downloadParakeet()
                 }
             }
-
         case .downloading:
             ProgressView().controlSize(.small)
-
         case .downloaded:
-            HStack(spacing: 8) {
-                if coordinator.config.asrEngine != engine {
-                    Button("Switch") {
-                        coordinator.config.asrEngine = engine
+            HStack(spacing: 12) {
+                if vm.config.asrEngine != engine {
+                    TapButton(title: "Switch") {
+                        vm.config.asrEngine = engine
                     }
                 }
-                Button("Delete", role: .destructive) {
-                    downloadManager.deleteModel(engine)
-                    if coordinator.config.asrEngine == engine {
-                        coordinator.config.asrEngine = .whisperKit
+                TapButton(title: "Delete", isDestructive: true) {
+                    vm.deleteModel(engine)
+                    if vm.config.asrEngine == engine {
+                        vm.config.asrEngine = .whisperKit
                     }
                 }
             }
@@ -279,68 +287,90 @@ struct ASREngineSettingsTab: View {
     }
 }
 
-// MARK: - Post-Processing Tab
+// MARK: - Post-Processing
 
-enum OllamaConnectionStatus { case unknown, connected, failed }
+private enum OllamaConnectionStatus { case unknown, connected, failed }
 
-struct PostProcessingSettingsTab: View {
-    @EnvironmentObject var coordinator: AppCoordinator
+private struct PostProcessingSection: View {
+    @ObservedObject var vm: SettingsViewModel
     @State private var connectionStatus: OllamaConnectionStatus = .unknown
     @State private var testing = false
 
     var body: some View {
-        Form {
-            Section("Post-Processor") {
-                Picker("Engine", selection: $coordinator.config.postProcessor) {
-                    Text("None (raw transcript)").tag(AppConfig.PostProcessorOption.passthrough)
-                    Text("Ollama (local LLM)").tag(AppConfig.PostProcessorOption.ollama)
+        VStack(alignment: .leading, spacing: 12) {
+            Text("Post-Processing").font(.headline)
+
+            HStack {
+                Text("Engine")
+                Spacer()
+                HStack(spacing: 4) {
+                    optionChip(label: "None", value: AppConfig.PostProcessorOption.passthrough,
+                               selection: vm.config.postProcessor) {
+                        vm.config.postProcessor = .passthrough
+                    }
+                    optionChip(label: "Ollama", value: AppConfig.PostProcessorOption.ollama,
+                               selection: vm.config.postProcessor) {
+                        vm.config.postProcessor = .ollama
+                    }
                 }
-                .pickerStyle(.radioGroup)
             }
 
-            if coordinator.config.postProcessor == .ollama {
-                Section("Ollama Configuration") {
-                    LabeledContent("Model") {
-                        TextField("e.g. qwen3.5:4b", text: $coordinator.config.ollamaModel)
-                            .textFieldStyle(.roundedBorder)
-                            .frame(maxWidth: 220)
-                    }
-                    LabeledContent("Host URL") {
-                        TextField("http://localhost:11434",
-                                  text: $coordinator.config.ollamaHost)
-                            .textFieldStyle(.roundedBorder)
-                            .frame(maxWidth: 220)
-                    }
-                    HStack(spacing: 12) {
-                        Button("Test Connection") {
+            if vm.config.postProcessor == .ollama {
+                HStack {
+                    Text("Model")
+                    Spacer()
+                    TextField("e.g. qwen3.5:4b", text: $vm.config.ollamaModel)
+                        .textFieldStyle(.roundedBorder)
+                        .frame(maxWidth: 200)
+                }
+                HStack {
+                    Text("Host URL")
+                    Spacer()
+                    TextField("http://localhost:11434", text: $vm.config.ollamaHost)
+                        .textFieldStyle(.roundedBorder)
+                        .frame(maxWidth: 200)
+                }
+                HStack(spacing: 12) {
+                    Text(testing ? "Testing…" : "Test Connection")
+                        .foregroundStyle(testing ? .secondary : Color.accentColor)
+                        .contentShape(Rectangle())
+                        .onTapGesture {
+                            guard !testing else { return }
                             Task { await testConnection() }
                         }
-                        .disabled(testing)
-
-                        switch connectionStatus {
-                        case .unknown:   EmptyView()
-                        case .connected: Label("Connected", systemImage: "checkmark.circle.fill")
-                                            .foregroundStyle(.green)
-                        case .failed:    Label("Failed", systemImage: "xmark.circle.fill")
-                                            .foregroundStyle(.red)
-                        }
+                    switch connectionStatus {
+                    case .unknown:   EmptyView()
+                    case .connected: Text("Connected").foregroundStyle(.green)
+                    case .failed:    Text("Failed").foregroundStyle(.red)
                     }
                 }
             }
         }
-        .formStyle(.grouped)
-        .onChange(of: coordinator.config.postProcessor) { _, _ in
-            connectionStatus = .unknown
-        }
+        .onChange(of: vm.config.postProcessor) { _, _ in connectionStatus = .unknown }
+    }
+
+    private func optionChip<T: Equatable>(
+        label: String,
+        value: T,
+        selection: T,
+        action: @escaping () -> Void
+    ) -> some View {
+        Text(label)
+            .font(.subheadline)
+            .padding(.horizontal, 8).padding(.vertical, 3)
+            .background(selection == value
+                ? Color.accentColor.opacity(0.2)
+                : Color.secondary.opacity(0.12))
+            .clipShape(RoundedRectangle(cornerRadius: 4))
+            .contentShape(Rectangle())
+            .onTapGesture(perform: action)
     }
 
     private func testConnection() async {
         testing = true
         defer { testing = false }
-        let host = coordinator.config.ollamaHost
-        guard let url = URL(string: host + "/api/tags") else {
-            connectionStatus = .failed
-            return
+        guard let url = URL(string: vm.config.ollamaHost + "/api/tags") else {
+            connectionStatus = .failed; return
         }
         do {
             let (_, response) = try await URLSession.shared.data(from: url)
@@ -351,156 +381,132 @@ struct PostProcessingSettingsTab: View {
     }
 }
 
-// MARK: - Audio Tab
+// MARK: - Audio
 
-struct AudioSettingsTab: View {
-    @EnvironmentObject var coordinator: AppCoordinator
-    @StateObject private var levelMonitor = MicLevelMonitor()
+private struct AudioSection: View {
+    @ObservedObject var vm: SettingsViewModel
     @State private var devices: [AudioDeviceInfo] = []
 
     var body: some View {
-        Form {
-            Section("Input Device") {
-                Picker("Device", selection: $coordinator.config.audioInputDeviceUID) {
-                    Text("System Default").tag(Optional<String>(nil))
+        VStack(alignment: .leading, spacing: 12) {
+            Text("Audio").font(.headline)
+
+            VStack(alignment: .leading, spacing: 6) {
+                Text("Input device")
+                VStack(alignment: .leading, spacing: 3) {
+                    deviceChip(label: "System Default", uid: nil)
                     ForEach(devices, id: \.uid) { device in
-                        Text(device.name).tag(Optional(device.uid))
+                        deviceChip(label: device.name, uid: device.uid)
                     }
                 }
+                .padding(.leading, 8)
             }
 
-            Section("Gain Normalization") {
-                Toggle("Normalize recording level",
-                       isOn: $coordinator.config.gainNormalizationEnabled)
-                if coordinator.config.gainNormalizationEnabled {
-                    LabeledContent("Target level") {
-                        HStack {
-                            Slider(value: $coordinator.config.gainTargetDBFS,
-                                   in: -30.0 ... -10.0, step: 1.0)
-                                .frame(maxWidth: 160)
-                            Text("\(Int(coordinator.config.gainTargetDBFS)) dBFS")
-                                .monospacedDigit()
-                                .frame(width: 65, alignment: .trailing)
-                        }
-                    }
+            CheckRow(label: "Normalize recording level",
+                     isOn: $vm.config.gainNormalizationEnabled)
+
+            if vm.config.gainNormalizationEnabled {
+                HStack {
+                    Text("Target level")
+                    Spacer()
+                    Slider(value: $vm.config.gainTargetDBFS, in: -30.0 ... -10.0, step: 1.0)
+                        .frame(maxWidth: 140)
+                    Text("\(Int(vm.config.gainTargetDBFS)) dBFS")
+                        .monospacedDigit()
+                        .frame(width: 60, alignment: .trailing)
                 }
             }
 
-            Section("Recording Limits") {
-                LabeledContent("Max duration") {
-                    Stepper(
-                        "\(Int(coordinator.config.maxRecordingDurationSeconds)) seconds",
-                        value: $coordinator.config.maxRecordingDurationSeconds,
-                        in: 5.0 ... 60.0,
-                        step: 5.0
-                    )
-                }
+            HStack {
+                Text("Max duration")
+                Spacer()
+                Stepper(
+                    "\(Int(vm.config.maxRecordingDurationSeconds))s",
+                    value: $vm.config.maxRecordingDurationSeconds,
+                    in: 5.0 ... 60.0, step: 5.0
+                )
             }
+        }
+        .onAppear { devices = AudioDeviceManager.availableInputDevices() }
+    }
 
-            Section("Mic Level") {
-                MicLevelMeterView(level: levelMonitor.level)
-                    .frame(height: 18)
-            }
-        }
-        .formStyle(.grouped)
-        .onAppear {
-            devices = AudioDeviceManager.availableInputDevices()
-            levelMonitor.start()
-        }
-        .onDisappear {
-            levelMonitor.stop()
-        }
+    private func deviceChip(label: String, uid: String?) -> some View {
+        let isSelected = uid == nil
+            ? vm.config.audioInputDeviceUID == nil
+            : vm.config.audioInputDeviceUID == uid
+        return Text(label)
+            .font(.subheadline)
+            .padding(.horizontal, 8).padding(.vertical, 3)
+            .background(isSelected
+                ? Color.accentColor.opacity(0.2)
+                : Color.secondary.opacity(0.12))
+            .clipShape(RoundedRectangle(cornerRadius: 4))
+            .contentShape(Rectangle())
+            .onTapGesture { vm.config.audioInputDeviceUID = uid }
     }
 }
 
-// MARK: - Mic Level Monitor
+// MARK: - History
 
-@MainActor
-final class MicLevelMonitor: ObservableObject {
-    @Published var level: Float = 0
-    private var engine: AVAudioEngine?
-
-    func start() {
-        let eng = AVAudioEngine()
-        engine = eng
-        let inputNode = eng.inputNode
-        let format = inputNode.outputFormat(forBus: 0)
-
-        inputNode.installTap(onBus: 0, bufferSize: 1024, format: format) { [weak self] buffer, _ in
-            guard let channelData = buffer.floatChannelData?[0] else { return }
-            let frameCount = Int(buffer.frameLength)
-            guard frameCount > 0 else { return }
-            var sum: Float = 0
-            for i in 0..<frameCount { sum += channelData[i] * channelData[i] }
-            let rms = sqrt(sum / Float(frameCount))
-            let db = 20.0 * log10(max(rms, 1e-8))
-            let normalized = Float(max(0.0, min(1.0, (db + 60.0) / 60.0)))
-            Task { @MainActor [weak self] in
-                self?.level = normalized
-            }
-        }
-        try? eng.start()
-    }
-
-    func stop() {
-        engine?.inputNode.removeTap(onBus: 0)
-        engine?.stop()
-        engine = nil
-        level = 0
-    }
-}
-
-// MARK: - Mic Level Meter View
-
-struct MicLevelMeterView: View {
-    let level: Float
+private struct HistorySection: View {
+    @ObservedObject var vm: SettingsViewModel
 
     var body: some View {
-        GeometryReader { geo in
-            ZStack(alignment: .leading) {
-                RoundedRectangle(cornerRadius: 3)
-                    .fill(.quaternary)
-                RoundedRectangle(cornerRadius: 3)
-                    .fill(meterColor)
-                    .frame(width: geo.size.width * CGFloat(max(0, level)))
-                    .animation(.easeOut(duration: 0.08), value: level)
+        VStack(alignment: .leading, spacing: 12) {
+            Text("History").font(.headline)
+
+            CheckRow(label: "Keep transcript history",
+                     isOn: $vm.config.keepTranscriptHistory)
+
+            HStack {
+                Text("Max entries")
+                Spacer()
+                Stepper(
+                    "\(vm.config.maxHistoryItems)",
+                    value: $vm.config.maxHistoryItems,
+                    in: 10 ... 1000, step: 10
+                )
+            }
+
+            TapButton(title: "Clear History", isDestructive: true) {
+                vm.clearHistory()
             }
         }
-    }
-
-    private var meterColor: Color {
-        if level > 0.8 { return .red }
-        if level > 0.5 { return .yellow }
-        return .green
     }
 }
 
-// MARK: - History Tab
+// MARK: - Gesture-based helpers
+// These replace SwiftUI Button/Toggle/Picker which trigger DesignLibrary
+// executor checks on macOS 26 (Tahoe) and crash when re-rendered.
 
-struct HistorySettingsTab: View {
-    @EnvironmentObject var coordinator: AppCoordinator
+/// Replaces SwiftUI Toggle.
+private struct CheckRow: View {
+    let label: String
+    @Binding var isOn: Bool
 
     var body: some View {
-        Form {
-            Section {
-                Toggle("Keep transcript history",
-                       isOn: $coordinator.config.keepTranscriptHistory)
-                LabeledContent("Max entries") {
-                    Stepper(
-                        "\(coordinator.config.maxHistoryItems)",
-                        value: $coordinator.config.maxHistoryItems,
-                        in: 10 ... 1000,
-                        step: 10
-                    )
-                }
-            }
-            Section {
-                Button("Clear History", role: .destructive) {
-                    // Implemented in Issue 18
-                }
-                .disabled(true)
-            }
+        HStack {
+            Text(label)
+            Spacer()
+            Text(isOn ? "✓" : "")
+                .foregroundStyle(Color.accentColor)
+                .frame(width: 20, alignment: .center)
         }
-        .formStyle(.grouped)
+        .contentShape(Rectangle())
+        .onTapGesture { isOn.toggle() }
+    }
+}
+
+/// Replaces SwiftUI Button.
+private struct TapButton: View {
+    let title: String
+    var isDestructive: Bool = false
+    let action: () -> Void
+
+    var body: some View {
+        Text(title)
+            .foregroundStyle(isDestructive ? .red : Color.accentColor)
+            .contentShape(Rectangle())
+            .onTapGesture(perform: action)
     }
 }

@@ -3,10 +3,12 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 77;
+	objectVersion = 56;
 	objects = {
 
 /* Begin PBXBuildFile section */
+		14984ADA237BCC4F0AEB1390 /* ShortcutService.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCE21C057942D99426210812 /* ShortcutService.swift */; };
+		48F13745826CFA81CD46540C /* AudioService.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA9DC9103D1D1D4BF087BFC9 /* AudioService.swift */; };
 		AAAA00000000000000000050 /* pspspsApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAAA00000000000000000010 /* pspspsApp.swift */; };
 		AAAA00000000000000000051 /* pspspsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAAA00000000000000000020 /* pspspsTests.swift */; };
 		AAAA00000000000000000052 /* WhisperKit in Frameworks */ = {isa = PBXBuildFile; productRef = AAAA00000000000000000081 /* WhisperKit */; };
@@ -52,7 +54,18 @@
 		AAAA00000000000000000104 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAAA00000000000000000103 /* OnboardingView.swift */; };
 		AAAA00000000000000000106 /* AccessibilityPermissionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAAA00000000000000000105 /* AccessibilityPermissionView.swift */; };
 		AAAA00000000000000000108 /* MicrophonePermissionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAAA00000000000000000107 /* MicrophonePermissionView.swift */; };
+		AAAA00000000000000000110 /* SettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAAA00000000000000000111 /* SettingsViewModel.swift */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		AAAA00000000000000000091 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = AAAA00000000000000000001 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = AAAA00000000000000000030;
+			remoteInfo = pspsps;
+		};
+/* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
 		AAAA00000000000000000010 /* pspspsApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = pspspsApp.swift; sourceTree = "<group>"; };
@@ -79,7 +92,6 @@
 		AAAA000000000000000000B0 /* AudioDeviceManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioDeviceManager.swift; sourceTree = "<group>"; };
 		AAAA000000000000000000C9 /* WhisperKitEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WhisperKitEngine.swift; sourceTree = "<group>"; };
 		AAAA000000000000000000CA /* ModelDownloadManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelDownloadManager.swift; sourceTree = "<group>"; };
-		AAAA000000000000000000F5 /* ParakeetEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ParakeetEngine.swift; sourceTree = "<group>"; };
 		AAAA000000000000000000CD /* test_speech.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = test_speech.wav; sourceTree = "<group>"; };
 		AAAA000000000000000000D1 /* WhisperKitIntegrationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WhisperKitIntegrationTests.swift; sourceTree = "<group>"; };
 		AAAA000000000000000000D3 /* HotkeyManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HotkeyManager.swift; sourceTree = "<group>"; };
@@ -94,6 +106,7 @@
 		AAAA000000000000000000EE /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		AAAA000000000000000000F1 /* OllamaPostProcessor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OllamaPostProcessor.swift; sourceTree = "<group>"; };
 		AAAA000000000000000000F3 /* OllamaPostProcessorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OllamaPostProcessorTests.swift; sourceTree = "<group>"; };
+		AAAA000000000000000000F5 /* ParakeetEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ParakeetEngine.swift; sourceTree = "<group>"; };
 		AAAA000000000000000000F8 /* ASRPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ASRPickerView.swift; sourceTree = "<group>"; };
 		AAAA000000000000000000FA /* TranscriptEntry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TranscriptEntry.swift; sourceTree = "<group>"; };
 		AAAA000000000000000000FB /* TranscriptHistory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TranscriptHistory.swift; sourceTree = "<group>"; };
@@ -102,6 +115,9 @@
 		AAAA00000000000000000103 /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
 		AAAA00000000000000000105 /* AccessibilityPermissionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccessibilityPermissionView.swift; sourceTree = "<group>"; };
 		AAAA00000000000000000107 /* MicrophonePermissionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MicrophonePermissionView.swift; sourceTree = "<group>"; };
+		AAAA00000000000000000111 /* SettingsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewModel.swift; sourceTree = "<group>"; };
+		BA9DC9103D1D1D4BF087BFC9 /* AudioService.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AudioService.swift; sourceTree = "<group>"; };
+		DCE21C057942D99426210812 /* ShortcutService.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ShortcutService.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -124,7 +140,7 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		AAAA00000000000000000002 /* pspsps */ = {
+		AAAA00000000000000000002 = {
 			isa = PBXGroup;
 			children = (
 				AAAA00000000000000000003 /* pspsps */,
@@ -170,6 +186,15 @@
 			path = pspspsTests;
 			sourceTree = "<group>";
 		};
+		AAAA00000000000000000005 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				AAAA00000000000000000013 /* pspsps.app */,
+				AAAA00000000000000000021 /* pspspsTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
 		AAAA000000000000000000C1 /* Core */ = {
 			isa = PBXGroup;
 			children = (
@@ -178,15 +203,6 @@
 				AAAA000000000000000000E6 /* Pipeline */,
 			);
 			path = Core;
-			sourceTree = "<group>";
-		};
-		AAAA000000000000000000E6 /* Pipeline */ = {
-			isa = PBXGroup;
-			children = (
-				AAAA000000000000000000E0 /* TranscriptionPipeline.swift */,
-				AAAA000000000000000000E2 /* PipelineFactory.swift */,
-			);
-			path = Pipeline;
 			sourceTree = "<group>";
 		};
 		AAAA000000000000000000C2 /* Protocols */ = {
@@ -233,6 +249,7 @@
 				AAAA000000000000000000AC /* AudioProcessor.swift */,
 				AAAA000000000000000000AF /* AudioCaptureManager.swift */,
 				AAAA000000000000000000B0 /* AudioDeviceManager.swift */,
+				BA9DC9103D1D1D4BF087BFC9 /* AudioService.swift */,
 			);
 			path = Audio;
 			sourceTree = "<group>";
@@ -245,14 +262,6 @@
 			path = Helpers;
 			sourceTree = "<group>";
 		};
-		AAAA000000000000000000CE /* TestFixtures */ = {
-			isa = PBXGroup;
-			children = (
-				AAAA000000000000000000CD /* test_speech.wav */,
-			);
-			path = TestFixtures;
-			sourceTree = "<group>";
-		};
 		AAAA000000000000000000C8 /* ASR */ = {
 			isa = PBXGroup;
 			children = (
@@ -263,22 +272,31 @@
 			path = ASR;
 			sourceTree = "<group>";
 		};
+		AAAA000000000000000000CE /* TestFixtures */ = {
+			isa = PBXGroup;
+			children = (
+				AAAA000000000000000000CD /* test_speech.wav */,
+			);
+			path = TestFixtures;
+			sourceTree = "<group>";
+		};
 		AAAA000000000000000000D5 /* Input */ = {
 			isa = PBXGroup;
 			children = (
 				AAAA000000000000000000D3 /* HotkeyManager.swift */,
 				AAAA000000000000000000D6 /* TextPaster.swift */,
+				DCE21C057942D99426210812 /* ShortcutService.swift */,
 			);
 			path = Input;
 			sourceTree = "<group>";
 		};
-		AAAA000000000000000000FD /* History */ = {
+		AAAA000000000000000000E6 /* Pipeline */ = {
 			isa = PBXGroup;
 			children = (
-				AAAA000000000000000000FA /* TranscriptEntry.swift */,
-				AAAA000000000000000000FB /* TranscriptHistory.swift */,
+				AAAA000000000000000000E0 /* TranscriptionPipeline.swift */,
+				AAAA000000000000000000E2 /* PipelineFactory.swift */,
 			);
-			path = History;
+			path = Pipeline;
 			sourceTree = "<group>";
 		};
 		AAAA000000000000000000EB /* UI */ = {
@@ -293,6 +311,15 @@
 			path = UI;
 			sourceTree = "<group>";
 		};
+		AAAA000000000000000000F0 /* Settings */ = {
+			isa = PBXGroup;
+			children = (
+				AAAA000000000000000000EE /* SettingsView.swift */,
+				AAAA00000000000000000111 /* SettingsViewModel.swift */,
+			);
+			path = Settings;
+			sourceTree = "<group>";
+		};
 		AAAA000000000000000000F7 /* Onboarding */ = {
 			isa = PBXGroup;
 			children = (
@@ -304,21 +331,13 @@
 			path = Onboarding;
 			sourceTree = "<group>";
 		};
-		AAAA000000000000000000F0 /* Settings */ = {
+		AAAA000000000000000000FD /* History */ = {
 			isa = PBXGroup;
 			children = (
-				AAAA000000000000000000EE /* SettingsView.swift */,
+				AAAA000000000000000000FA /* TranscriptEntry.swift */,
+				AAAA000000000000000000FB /* TranscriptHistory.swift */,
 			);
-			path = Settings;
-			sourceTree = "<group>";
-		};
-		AAAA00000000000000000005 /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				AAAA00000000000000000013 /* pspsps.app */,
-				AAAA00000000000000000021 /* pspspsTests.xctest */,
-			);
-			name = Products;
+			path = History;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -405,24 +424,6 @@
 		};
 /* End PBXProject section */
 
-/* Begin PBXContainerItemProxy section */
-		AAAA00000000000000000091 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = AAAA00000000000000000001 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = AAAA00000000000000000030;
-			remoteInfo = pspsps;
-		};
-/* End PBXContainerItemProxy section */
-
-/* Begin PBXTargetDependency section */
-		AAAA00000000000000000090 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = AAAA00000000000000000030 /* pspsps */;
-			targetProxy = AAAA00000000000000000091 /* PBXContainerItemProxy */;
-		};
-/* End PBXTargetDependency section */
-
 /* Begin PBXResourcesBuildPhase section */
 		AAAA00000000000000000042 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
@@ -469,7 +470,8 @@
 				AAAA000000000000000000EA /* MenuBarController.swift in Sources */,
 				AAAA000000000000000000ED /* RecordingOverlay.swift in Sources */,
 				AAAA000000000000000000EF /* SettingsView.swift in Sources */,
-			AAAA000000000000000000F2 /* OllamaPostProcessor.swift in Sources */,
+				AAAA00000000000000000110 /* SettingsViewModel.swift in Sources */,
+				AAAA000000000000000000F2 /* OllamaPostProcessor.swift in Sources */,
 				AAAA000000000000000000F6 /* ParakeetEngine.swift in Sources */,
 				AAAA000000000000000000F9 /* ASRPickerView.swift in Sources */,
 				AAAA000000000000000000FE /* TranscriptEntry.swift in Sources */,
@@ -478,6 +480,8 @@
 				AAAA00000000000000000104 /* OnboardingView.swift in Sources */,
 				AAAA00000000000000000106 /* AccessibilityPermissionView.swift in Sources */,
 				AAAA00000000000000000108 /* MicrophonePermissionView.swift in Sources */,
+				48F13745826CFA81CD46540C /* AudioService.swift in Sources */,
+				14984ADA237BCC4F0AEB1390 /* ShortcutService.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -493,12 +497,20 @@
 				AAAA000000000000000000D2 /* WhisperKitIntegrationTests.swift in Sources */,
 				AAAA000000000000000000D9 /* TextPasterTests.swift in Sources */,
 				AAAA000000000000000000E5 /* TranscriptionPipelineTests.swift in Sources */,
-			AAAA000000000000000000F4 /* OllamaPostProcessorTests.swift in Sources */,
-			AAAA00000000000000000102 /* TranscriptHistoryTests.swift in Sources */,
+				AAAA000000000000000000F4 /* OllamaPostProcessorTests.swift in Sources */,
+				AAAA00000000000000000102 /* TranscriptHistoryTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		AAAA00000000000000000090 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = AAAA00000000000000000030 /* pspsps */;
+			targetProxy = AAAA00000000000000000091 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		AAAA00000000000000000070 /* Debug */ = {
@@ -619,17 +631,19 @@
 				CODE_SIGN_ENTITLEMENTS = pspsps/pspsps.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = D3GF6W62YK;
+				ENABLE_DEBUG_DYLIB = NO;
 				INFOPLIST_FILE = pspsps/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				OTHER_SWIFT_FLAGS = "-disable-dynamic-actor-isolation";
 				PRODUCT_BUNDLE_IDENTIFIER = com.pspsps.pspsps;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_VERSION = 6.0;
+				SWIFT_VERSION = 5.0;
 			};
 			name = Debug;
 		};
@@ -639,7 +653,7 @@
 				CODE_SIGN_ENTITLEMENTS = pspsps/pspsps.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = D3GF6W62YK;
 				INFOPLIST_FILE = pspsps/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -649,7 +663,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.pspsps.pspsps;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_VERSION = 6.0;
+				SWIFT_VERSION = 5.0;
 			};
 			name = Release;
 		};
@@ -664,7 +678,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.pspsps.pspspsTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_VERSION = 6.0;
+				SWIFT_VERSION = 5.0;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/pspsps.app/Contents/MacOS/pspsps";
 			};
 			name = Debug;
@@ -680,7 +694,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.pspsps.pspspsTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_VERSION = 6.0;
+				SWIFT_VERSION = 5.0;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/pspsps.app/Contents/MacOS/pspsps";
 			};
 			name = Release;
@@ -748,7 +762,6 @@
 			productName = FluidAudio;
 		};
 /* End XCSwiftPackageProductDependency section */
-
 	};
 	rootObject = AAAA00000000000000000001 /* Project object */;
 }

@@ -1,6 +1,6 @@
 import Foundation
 
-struct AppConfig: Codable, Sendable {
+struct AppConfig: Codable, Sendable, Equatable {
 
     // MARK: - ASR
     var asrEngine: ASREngineOption = .whisperKit
@@ -8,7 +8,7 @@ struct AppConfig: Codable, Sendable {
     var parakeetModel: String = "parakeet-tdt-0.6b-v3"
 
     // MARK: - Post-processing
-    var postProcessor: PostProcessorOption = .ollama
+    var postProcessor: PostProcessorOption = .passthrough
     var ollamaModel: String = "qwen3.5:4b"
     var ollamaHost: String = "http://localhost:11434"
 
