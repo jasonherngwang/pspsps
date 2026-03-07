@@ -183,10 +183,13 @@ final class AppCoordinator: ObservableObject {
 
     private var captureTask: Task<Void, Never>?
     private var stopContinuation: CheckedContinuation<Void, Never>?
+    private var pendingStop = false
 
     private func handleHotkeyStarted() {
         guard state == .idle else { return }
         state = .recording
+        pendingStop = false
+        stopContinuation = nil
         let frontmost = NSWorkspace.shared.frontmostApplication
         capturedSourceApp = frontmost?.localizedName
         capturedSourceAppBundleID = frontmost?.bundleIdentifier
@@ -197,6 +200,14 @@ final class AppCoordinator: ObservableObject {
                 try await Task.detached {
                     try self.audioService.startCaptureDirect()
                 }.value
+                
+                // Engine is now running. Did the user already release the key?
+                if self.pendingStop {
+                    let buffer = self.audioService.stopCapture()
+                    self.logger.info("stopCapture (early release) returned buffer with \(buffer.frameLength) frames")
+                    self.runTranscription(buffer: buffer)
+                    return
+                }
                 
                 // Wait for the user to release the hotkey
                 await withCheckedContinuation { continuation in
@@ -221,8 +232,14 @@ final class AppCoordinator: ObservableObject {
 
     private func handleHotkeyStopped() {
         guard state == .recording else { return }
-        stopContinuation?.resume()
-        stopContinuation = nil
+        if let cont = stopContinuation {
+            // Engine booted and Task is waiting — resume it
+            stopContinuation = nil
+            cont.resume()
+        } else {
+            // Engine still booting — mark for immediate stop after boot
+            pendingStop = true
+        }
     }
 
     private func runTranscription(buffer: AVAudioPCMBuffer) {
