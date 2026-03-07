@@ -14,7 +14,6 @@ final class AudioCaptureManager: AudioInputSource {
     private let lock = NSLock()
     private var maxDurationTimer: Timer?
     private var isCapturing = false
-    private var isRecordingRequested = false
     private var configChangeObserver: (any NSObjectProtocol)?
 
     private let outputFormat = AVAudioFormat(
@@ -34,51 +33,38 @@ final class AudioCaptureManager: AudioInputSource {
 
     func startCapture() throws {
         lock.lock()
-        guard !isCapturing && !isRecordingRequested else {
+        guard !isCapturing else {
             lock.unlock()
             return
         }
-        isRecordingRequested = true
-        accumulatedBuffers = []
         lock.unlock()
 
         let inputNode = engine.inputNode
         let inputFormat = inputNode.outputFormat(forBus: 0)
         
         guard inputFormat.channelCount > 0 else {
-            lock.lock()
-            isRecordingRequested = false
-            lock.unlock()
             throw AudioCaptureError.invalidInputFormat
         }
+
+        lock.lock()
+        accumulatedBuffers = []
+        lock.unlock()
 
         inputNode.installTap(onBus: 0, bufferSize: 4096, format: inputFormat) { [weak self] buffer, _ in
             guard let self else { return }
             if let converted = self.convert(buffer, to: self.outputFormat) {
                 self.lock.lock()
-                if self.isRecordingRequested {
-                    self.accumulatedBuffers.append(converted)
-                }
+                self.accumulatedBuffers.append(converted)
                 self.lock.unlock()
             }
         }
 
         do {
             try engine.start()
-            
             lock.lock()
             isCapturing = true
-            let shouldAbort = !isRecordingRequested
             lock.unlock()
-            
-            if shouldAbort {
-                _ = self.stopCapture()
-                return
-            }
         } catch {
-            lock.lock()
-            isRecordingRequested = false
-            lock.unlock()
             inputNode.removeTap(onBus: 0)
             throw error
         }
@@ -105,8 +91,6 @@ final class AudioCaptureManager: AudioInputSource {
     func stopCapture() -> AVAudioPCMBuffer {
         lock.lock()
         defer { lock.unlock() }
-        
-        isRecordingRequested = false
 
         guard isCapturing else {
             return AVAudioPCMBuffer(pcmFormat: outputFormat, frameCapacity: 0)!

@@ -181,6 +181,8 @@ final class AppCoordinator: ObservableObject {
         }
     }
 
+    private var captureTask: Task<Void, Never>?
+
     private func handleHotkeyStarted() {
         guard state == .idle else { return }
         state = .recording
@@ -188,7 +190,7 @@ final class AppCoordinator: ObservableObject {
         capturedSourceApp = frontmost?.localizedName
         capturedSourceAppBundleID = frontmost?.bundleIdentifier
         
-        Task {
+        captureTask = Task {
             do {
                 try await audioService.startCapture()
             } catch {
@@ -205,8 +207,13 @@ final class AppCoordinator: ObservableObject {
 
     private func handleHotkeyStopped() {
         guard state == .recording else { return }
-        let buffer = audioService.stopCapture()
-        runTranscription(buffer: buffer)
+        Task {
+            // Wait for engine.start() to finish before stopping
+            await captureTask?.value
+            captureTask = nil
+            let buffer = audioService.stopCapture()
+            runTranscription(buffer: buffer)
+        }
     }
 
     private func runTranscription(buffer: AVAudioPCMBuffer) {
