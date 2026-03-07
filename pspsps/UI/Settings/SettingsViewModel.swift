@@ -6,9 +6,10 @@ final class SettingsViewModel: ObservableObject {
         didSet {
             config.save()
             let newConfig = config
-            Task { @MainActor [weak coordinator] in
-                if coordinator?.config != newConfig {
-                    coordinator?.config = newConfig
+            Task { @MainActor [weak self] in
+                guard let self = self, let coordinator = self.coordinator else { return }
+                if coordinator.config != newConfig {
+                    coordinator.config = newConfig
                 }
             }
         }
@@ -28,15 +29,7 @@ final class SettingsViewModel: ObservableObject {
         self.whisperKitState = coordinator.downloadManager.whisperKitState
         self.parakeetState = coordinator.downloadManager.parakeetState
 
-        coordinator.$config
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] newConfig in
-                guard let self else { return }
-                if self.config != newConfig {
-                    self.config = newConfig
-                }
-            }
-            .store(in: &cancellables)
+
 
         coordinator.downloadManager.$whisperKitState
             .receive(on: DispatchQueue.main)
