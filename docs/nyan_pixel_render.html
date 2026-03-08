@@ -1,0 +1,63 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Pixel Render</title>
+
+    <style>
+      body {
+        margin: 0;
+        background: #111;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+      }
+
+      canvas {
+        image-rendering: pixelated;
+      }
+    </style>
+  </head>
+
+  <body>
+    <canvas id="c"></canvas>
+
+    <script>
+      const canvas = document.getElementById("c");
+      const ctx = canvas.getContext("2d");
+
+      fetch("nyan_pspsps_pixel_grid.json")
+        .then((r) => r.json())
+        .then((data) => {
+          canvas.width = data.width;
+          canvas.height = data.height;
+
+          const img = ctx.createImageData(data.width, data.height);
+
+          for (let y = 0; y < data.height; y++) {
+            for (let x = 0; x < data.width; x++) {
+              const paletteIndex = data.grid[y][x];
+              const [r, g, b] = data.palette[paletteIndex];
+
+              const i = (y * data.width + x) * 4;
+
+              img.data[i] = r;
+              img.data[i + 1] = g;
+              img.data[i + 2] = b;
+              img.data[i + 3] = 255;
+            }
+          }
+
+          ctx.putImageData(img, 0, 0);
+
+          // scale display to ~300px width
+          const targetWidth = 300;
+          const scale = targetWidth / data.width;
+
+          canvas.style.width = data.width * scale + "px";
+          canvas.style.height = data.height * scale + "px";
+        });
+    </script>
+  </body>
+</html>

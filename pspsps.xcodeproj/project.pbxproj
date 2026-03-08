@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		AAAA0000000000000000010A /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AAAA00000000000000000109 /* Assets.xcassets */; };
 		14984ADA237BCC4F0AEB1390 /* ShortcutService.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCE21C057942D99426210812 /* ShortcutService.swift */; };
 		48F13745826CFA81CD46540C /* AudioService.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA9DC9103D1D1D4BF087BFC9 /* AudioService.swift */; };
 		AAAA00000000000000000050 /* pspspsApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAAA00000000000000000010 /* pspspsApp.swift */; };
@@ -67,6 +68,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		AAAA00000000000000000109 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		AAAA00000000000000000010 /* pspspsApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = pspspsApp.swift; sourceTree = "<group>"; };
 		AAAA00000000000000000011 /* pspsps.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = pspsps.entitlements; sourceTree = "<group>"; };
 		AAAA00000000000000000012 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -150,6 +152,7 @@
 		AAAA00000000000000000003 /* pspsps */ = {
 			isa = PBXGroup;
 			children = (
+				AAAA00000000000000000109 /* Assets.xcassets */,
 				AAAA00000000000000000010 /* pspspsApp.swift */,
 				AAAA000000000000000000AA /* AppConfig.swift */,
 				AAAA000000000000000000E7 /* AppCoordinator.swift */,
@@ -426,6 +429,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				AAAA0000000000000000010A /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

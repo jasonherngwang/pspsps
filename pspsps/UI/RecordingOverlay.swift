@@ -103,10 +103,10 @@ final class RecordingOverlay {
     private func positionTopCenter(_ panel: NSPanel) {
         guard let screen = NSScreen.main ?? NSScreen.screens.first else { return }
         let visible = screen.visibleFrame
-        let pw: CGFloat = 220
-        let ph: CGFloat = 80
+        let pw: CGFloat = 210
+        let ph: CGFloat = 70
         let topMargin: CGFloat = 8
-        
+
         panel.setFrame(
             NSRect(
                 x: visible.midX - (pw / 2),
@@ -138,145 +138,75 @@ private struct OverlayView: View {
     var body: some View {
         NyanCatView(isRecording: viewModel.mode == .recording)
             .shadow(color: .black.opacity(0.3), radius: 4, y: 2)
-            .animation(.easeInOut(duration: 0.3), value: viewModel.mode)
     }
 }
 
-// MARK: - Pixel Art Drawing Helpers
-
-/// A single filled pixel-block in the grid.
-private struct Pixel: View {
-    let color: Color
-    let px: Int
-    let py: Int
-    let size: CGFloat
-
-    var body: some View {
-        Rectangle()
-            .fill(color)
-            .frame(width: size, height: size)
-            .position(x: CGFloat(px) * size + size / 2,
-                      y: CGFloat(py) * size + size / 2)
-    }
-}
-
-/// Draw a filled rectangle of pixels from (x1,y1) to (x2,y2) inclusive.
-private struct PixelRect: View {
-    let color: Color
-    let x1, y1, x2, y2: Int
-    let s: CGFloat
-
-    var body: some View {
-        let w = CGFloat(x2 - x1 + 1) * s
-        let h = CGFloat(y2 - y1 + 1) * s
-        Rectangle()
-            .fill(color)
-            .frame(width: w, height: h)
-            .position(x: CGFloat(x1) * s + w / 2,
-                      y: CGFloat(y1) * s + h / 2)
-    }
-}
-
-// MARK: - Nyan Cat Pixel Art
+// MARK: - Nyan Cat (PNG asset + dynamic waveform overlay)
 
 struct NyanCatView: View {
     let isRecording: Bool
-    @State private var peaks: [CGFloat] = Array(repeating: 0.5, count: 9)
-    @State private var phase: CGFloat = 0
+    @State private var peaks: [CGFloat] = Array(repeating: 0.5, count: 16)
     private let timer = Timer.publish(every: 0.15, on: .main, in: .common).autoconnect()
 
-    // Pixel unit size (each "pixel" = s × s points)
-    private let s: CGFloat = 3
+    /// Display size in points.
+    private let displayWidth: CGFloat = 200
+    private let displayHeight: CGFloat = 60
 
-    // Colors matching the reference image
-    private let black       = Color.black
-    private let crustColor  = Color(red: 1.0, green: 0.82, blue: 0.62)   // tan crust
-    private let icingColor  = Color(red: 1.0, green: 0.68, blue: 0.84)   // pink icing
-    private let sprinkleColor = Color(red: 1.0, green: 0.55, blue: 0.72) // darker pink sprinkles
-    private let waveColor   = Color(red: 0.86, green: 0.15, blue: 0.53)  // dark pink waveform
-    private let catGray     = Color(red: 0.55, green: 0.55, blue: 0.55)  // gray body
-    private let catLightGray = Color(red: 0.70, green: 0.70, blue: 0.70) // lighter gray
-    private let catDarkGray = Color(red: 0.35, green: 0.35, blue: 0.35)  // dark feet
-    private let cheekPink   = Color(red: 1.0, green: 0.6, blue: 0.65)    // cheek
-    private let nosePink    = Color(red: 1.0, green: 0.55, blue: 0.6)    // nose
+    /// Icing region as fraction of the image (for waveform/spinner placement).
+    private let icingX: CGFloat = 0.13
+    private let icingY: CGFloat = 0.20
+    private let icingW: CGFloat = 0.70
+    private let icingH: CGFloat = 0.55
 
-    // Body dimensions in pixels
-    private let bodyW = 22   // pop-tart width in pixels
-    private let bodyH = 14   // pop-tart height in pixels
+    /// Waveform bar color (darker pink, matching original sprinkle color).
+    private let barColor = Color(red: 0.90, green: 0.35, blue: 0.55)
 
     var body: some View {
-        let legBounce = Int(phase * 4) % 2 == 0
-        let bodyBob = sin(phase * .pi * 4) * 2
+        ZStack {
+            Image("NyanCat")
+                .interpolation(.none)
+                .resizable()
+                .frame(width: displayWidth, height: displayHeight)
 
-        HStack(spacing: 0) {
-            // Rainbow Trail
-            RainbowTrail()
-                .frame(width: 40, height: CGFloat(bodyH - 2) * s)
-                .mask(
-                    LinearGradient(
-                        gradient: Gradient(colors: [.clear, .black]),
-                        startPoint: .leading,
-                        endPoint: .trailing
+            if isRecording {
+                Canvas { ctx, size in
+                    let region = CGRect(
+                        x: icingX * size.width,
+                        y: icingY * size.height,
+                        width: icingW * size.width,
+                        height: icingH * size.height
                     )
-                )
-                .offset(y: CGFloat(bodyBob))
+                    let barCount = peaks.count
+                    let gap: CGFloat = 1.5
+                    let barWidth: CGFloat = 3
+                    let totalWidth = CGFloat(barCount) * barWidth + CGFloat(barCount - 1) * gap
+                    let insetX = (region.width - totalWidth) / 2
 
-            // Cat Body Assembly
-            ZStack(alignment: .topLeading) {
-                // Tail – pixel stub
-                tailPixels
-
-                // Back legs
-                PixelRect(color: catDarkGray, x1: 3, y1: bodyH, x2: 4, y2: bodyH + 2, s: s)
-                    .offset(y: legBounce ? 0 : -s)
-                PixelRect(color: catDarkGray, x1: 6, y1: bodyH, x2: 7, y2: bodyH + 2, s: s)
-                    .offset(y: legBounce ? -s : 0)
-
-                // Front legs
-                PixelRect(color: catDarkGray, x1: bodyW - 5, y1: bodyH, x2: bodyW - 4, y2: bodyH + 2, s: s)
-                    .offset(y: legBounce ? -s : 0)
-                PixelRect(color: catDarkGray, x1: bodyW - 2, y1: bodyH, x2: bodyW - 1, y2: bodyH + 2, s: s)
-                    .offset(y: legBounce ? 0 : -s)
-
-                // Pop-Tart outline (black border) with pixel-rounded corners
-                PixelRect(color: black, x1: 2, y1: 0, x2: bodyW - 1, y2: 0, s: s)       // top
-                PixelRect(color: black, x1: 2, y1: bodyH - 1, x2: bodyW - 1, y2: bodyH - 1, s: s)  // bottom
-                PixelRect(color: black, x1: 1, y1: 1, x2: 1, y2: bodyH - 2, s: s)       // left
-                PixelRect(color: black, x1: bodyW, y1: 1, x2: bodyW, y2: bodyH - 2, s: s) // right
-
-                // Pop-Tart crust fill
-                PixelRect(color: crustColor, x1: 2, y1: 1, x2: bodyW - 1, y2: bodyH - 2, s: s)
-
-                // Pop-Tart icing fill (inset)
-                PixelRect(color: icingColor, x1: 3, y1: 2, x2: bodyW - 2, y2: bodyH - 3, s: s)
-
-                // Sprinkles
-                sprinklePixels
-
-                // Waveform or spinner
-                if isRecording {
-                    waveformView
-                } else {
-                    ProgressView()
-                        .controlSize(.small)
-                        .tint(waveColor)
-                        .frame(
-                            width: CGFloat(bodyW - 6) * s,
-                            height: CGFloat(bodyH - 6) * s
+                    for (i, peak) in peaks.enumerated() {
+                        let barH = max(2, region.height * peak)
+                        let x = region.minX + insetX + CGFloat(i) * (barWidth + gap)
+                        let y = region.midY - barH / 2
+                        ctx.fill(
+                            Path(CGRect(x: x, y: y, width: barWidth, height: barH)),
+                            with: .color(barColor)
                         )
-                        .offset(
-                            x: 4 * s,
-                            y: 3 * s
-                        )
+                    }
                 }
-
-                // Cat Head
-                PixelCatHead(s: s, catGray: catGray, cheekPink: cheekPink, nosePink: nosePink)
-                    .offset(x: CGFloat(bodyW - 1) * s, y: 0 * s)
+                .frame(width: displayWidth, height: displayHeight)
+                .allowsHitTesting(false)
+            } else {
+                ProgressView()
+                    .controlSize(.regular)
+                    .scaleEffect(1.17)
+                    .colorMultiply(Color(red: 0.85, green: 0.15, blue: 0.45))
+                    .position(
+                        x: displayWidth * (icingX + icingW / 2),
+                        y: displayHeight * (icingY + icingH / 2)
+                    )
+                    .frame(width: displayWidth, height: displayHeight)
             }
-            .frame(width: CGFloat(bodyW + 12) * s, height: CGFloat(bodyH + 3) * s)
-            .offset(y: CGFloat(bodyBob))
         }
+        .frame(width: displayWidth, height: displayHeight)
         .onReceive(timer) { _ in
             if isRecording {
                 for i in 0..<peaks.count {
@@ -284,138 +214,5 @@ struct NyanCatView: View {
                 }
             }
         }
-        .onAppear {
-            withAnimation(.linear(duration: 1.0).repeatForever(autoreverses: false)) {
-                phase = 1.0
-            }
-        }
-    }
-
-    // MARK: - Sub-views
-
-    private var tailPixels: some View {
-        let tailY = 5
-        return ZStack(alignment: .topLeading) {
-            // Gray tail stub - three pixels going left
-            PixelRect(color: catGray, x1: 0, y1: tailY, x2: 0, y2: tailY + 2, s: s)
-            PixelRect(color: catGray, x1: 1, y1: tailY, x2: 1, y2: tailY + 3, s: s)
-        }
-    }
-
-    private var sprinklePixels: some View {
-        // Scattered darker-pink sprinkle dots on the icing
-        let positions: [(Int, Int)] = [
-            (5, 3), (8, 4), (11, 3), (14, 5), (17, 3),
-            (6, 7), (9, 8), (13, 7), (16, 8), (19, 6),
-            (5, 10), (10, 10), (15, 10), (18, 4), (7, 5),
-            (12, 9), (4, 6), (17, 9)
-        ]
-        return ZStack(alignment: .topLeading) {
-            ForEach(0..<positions.count, id: \.self) { i in
-                Pixel(color: sprinkleColor, px: positions[i].0, py: positions[i].1, size: s)
-            }
-        }
-    }
-
-    private var waveformView: some View {
-        // Pixelated waveform bars inside the icing area
-        let barAreaX = 4    // start x in pixels
-        let barAreaY = 3    // top of bar area
-        let maxBarH = bodyH - 6  // max bar height in pixels
-
-        return ZStack(alignment: .topLeading) {
-            ForEach(0..<peaks.count, id: \.self) { i in
-                let barH = max(1, Int(CGFloat(maxBarH) * peaks[i]))
-                let x = barAreaX + i * 2
-                let y = barAreaY + (maxBarH - barH)
-                PixelRect(color: waveColor, x1: x, y1: y, x2: x, y2: y + barH - 1, s: s)
-                    .animation(.easeOut(duration: 0.12), value: peaks[i])
-            }
-        }
-    }
-}
-
-// MARK: - Rainbow Trail
-
-struct RainbowTrail: View {
-    private let colors: [Color] = [.red, .orange, .yellow, .green, .blue, .purple]
-
-    var body: some View {
-        VStack(spacing: 0) {
-            ForEach(0..<colors.count, id: \.self) { i in
-                Rectangle()
-                    .fill(colors[i])
-            }
-        }
-    }
-}
-
-// MARK: - Pixel Cat Head
-
-private struct PixelCatHead: View {
-    let s: CGFloat
-    let catGray: Color
-    let cheekPink: Color
-    let nosePink: Color
-
-    // 11 pixels wide × 11 tall (rows 0-2 ears, rows 3-10 head)
-    private let headW = 11
-    private let headH = 11
-
-    var body: some View {
-        ZStack(alignment: .topLeading) {
-            // -- Left ear (tip at row 0, base merges at row 2) --
-            PixelRect(color: .black, x1: 1, y1: 0, x2: 2, y2: 0, s: s)   // tip
-            Pixel(color: .black, px: 0, py: 1, size: s)
-            Pixel(color: catGray, px: 1, py: 1, size: s)
-            Pixel(color: catGray, px: 2, py: 1, size: s)
-            Pixel(color: .black, px: 3, py: 1, size: s)
-            Pixel(color: .black, px: 0, py: 2, size: s)
-            Pixel(color: catGray, px: 1, py: 2, size: s)
-            Pixel(color: catGray, px: 2, py: 2, size: s)
-            Pixel(color: .black, px: 3, py: 2, size: s)
-
-            // -- Right ear --
-            PixelRect(color: .black, x1: 8, y1: 0, x2: 9, y2: 0, s: s)
-            Pixel(color: .black, px: 7, py: 1, size: s)
-            Pixel(color: catGray, px: 8, py: 1, size: s)
-            Pixel(color: catGray, px: 9, py: 1, size: s)
-            Pixel(color: .black, px: 10, py: 1, size: s)
-            Pixel(color: .black, px: 7, py: 2, size: s)
-            Pixel(color: catGray, px: 8, py: 2, size: s)
-            Pixel(color: catGray, px: 9, py: 2, size: s)
-            Pixel(color: .black, px: 10, py: 2, size: s)
-
-            // -- Head outline (rows 3-10) --
-            PixelRect(color: .black, x1: 0, y1: 3, x2: 10, y2: 3, s: s)   // top
-            PixelRect(color: .black, x1: 0, y1: 10, x2: 10, y2: 10, s: s) // bottom
-            PixelRect(color: .black, x1: 0, y1: 3, x2: 0, y2: 10, s: s)   // left
-            PixelRect(color: .black, x1: 10, y1: 3, x2: 10, y2: 10, s: s) // right
-
-            // Gray fill
-            PixelRect(color: catGray, x1: 1, y1: 4, x2: 9, y2: 9, s: s)
-
-            // -- Eyes: white 2×2 with black pupil in bottom-right --
-            // Left eye
-            PixelRect(color: .white, x1: 2, y1: 5, x2: 3, y2: 6, s: s)
-            Pixel(color: .black, px: 3, py: 6, size: s)  // pupil
-
-            // Right eye
-            PixelRect(color: .white, x1: 7, y1: 5, x2: 8, y2: 6, s: s)
-            Pixel(color: .black, px: 8, py: 6, size: s)  // pupil
-
-            // Nose (pink)
-            Pixel(color: nosePink, px: 5, py: 7, size: s)
-
-            // Mouth – "w"
-            Pixel(color: .black, px: 4, py: 8, size: s)
-            Pixel(color: .black, px: 5, py: 8, size: s)
-            Pixel(color: .black, px: 6, py: 8, size: s)
-
-            // Cheeks
-            PixelRect(color: cheekPink, x1: 1, y1: 7, x2: 2, y2: 7, s: s)
-            PixelRect(color: cheekPink, x1: 8, y1: 7, x2: 9, y2: 7, s: s)
-        }
-        .frame(width: CGFloat(headW) * s, height: CGFloat(headH) * s)
     }
 }
