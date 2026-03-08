@@ -184,17 +184,17 @@ private struct ASREngineSection: View {
             Text("ASR Engine").font(.headline)
 
             engineRow(
-                engine: .whisperKit,
-                state: vm.whisperKitState,
-                title: "WhisperKit (large-v3-turbo)",
-                subtitle: "~600 MB · ~0.45s latency · Best for whispers, accents, noise",
-                isRecommended: true
-            )
-            engineRow(
                 engine: .parakeet,
                 state: vm.parakeetState,
                 title: "Parakeet TDT v3",
                 subtitle: "~480 MB · ~0.19s latency · Best for clear speech, speed",
+                isRecommended: true
+            )
+            engineRow(
+                engine: .whisperKit,
+                state: vm.whisperKitState,
+                title: "WhisperKit (large-v3-turbo)",
+                subtitle: "~600 MB · ~0.45s latency · Best for whispers, accents, noise",
                 isRecommended: false
             )
         }
@@ -222,8 +222,11 @@ private struct ASREngineSection: View {
                     }
                     if vm.config.asrEngine == engine {
                         Text("Active")
+                            .font(.caption2).bold()
+                            .padding(.horizontal, 6).padding(.vertical, 2)
+                            .background(.green.opacity(0.15))
                             .foregroundStyle(.green)
-                            .font(.caption)
+                            .clipShape(Capsule())
                     }
                 }
                 Text(subtitle).font(.caption).foregroundStyle(.secondary)

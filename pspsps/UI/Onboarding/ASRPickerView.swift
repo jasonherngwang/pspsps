@@ -46,22 +46,22 @@ struct ASRPickerView: View {
     private var engineCards: some View {
         VStack(spacing: 12) {
             engineCard(
-                engine: .whisperKit,
-                title: "WhisperKit",
-                size: "~600 MB",
-                latency: "~0.45s latency",
-                bestFor: "Best for whispers, accents, noise",
-                isRecommended: true,
-                available: true
-            )
-            engineCard(
                 engine: .parakeet,
                 title: "Parakeet",
                 size: "~480 MB",
                 latency: "~0.19s latency",
                 bestFor: "Best for clear speech, speed",
-                isRecommended: false,
+                isRecommended: true,
                 available: parakeetEngineAvailable
+            )
+            engineCard(
+                engine: .whisperKit,
+                title: "WhisperKit",
+                size: "~600 MB",
+                latency: "~0.45s latency",
+                bestFor: "Best for whispers, accents, noise",
+                isRecommended: false,
+                available: true
             )
         }
     }
