@@ -1,19 +1,31 @@
 <p align="center">
-  <img src="pspsps.png" width="280" alt="pspsps logo" />
+  <img src="screenshots/pspsps.png" width="280" alt="pspsps logo" />
 </p>
 
 <p align="center">
   <strong>Local voice-to-text for macOS</strong><br>
-  Parakeet or WhisperKit + Qwen3.5 post-processing
+  Parakeet + Qwen3.5 post-processing
 </p>
 
 ---
 
 ## pspsps 😸
 
-- **ASR engines**: [Parakeet TDT](https://github.com/FluidInference/FluidAudio) or [WhisperKit](https://github.com/argmaxinc/WhisperKit)
-- **Push-to-talk or toggle mode**: configurable hotkey
-- **Optional LLM cleanup**: route transcripts through a local [Ollama](https://ollama.ai) model like Qwen3.5 to fix punctuation and remove filler words (slow and not necessary IMO)
+**ASR engines**: [Parakeet TDT](https://github.com/FluidInference/FluidAudio) or [WhisperKit](https://github.com/argmaxinc/WhisperKit)
+
+**Push-to-talk or toggle mode** with configurable hotkey
+
+**Optional LLM cleanup**: route transcripts through a local [Ollama](https://ollama.ai) model like Qwen3.5 to fix punctuation and remove filler words (slow and not necessary IMO)
+
+<p align="center">
+  <img src="screenshots/overlay.png" alt="pspsps overlay" />
+  <img src="screenshots/settings.png" width="300" alt="pspsps overlay" />
+</p>
+
+Stuff I learned
+
+- Something in the Settings menu kept crashing the app - Opus 4.6 went in circles for hours debugging it. I tried to provide backpressure/feedback by letting it write osascript to click the menubar, instead of me manually doing that and telling the model what happened. This wasn't getting anywhere, so I opened Antigravity, and Gemini 3.1 Pro oneshotted it.
+- Another example of feedback - Opus kept getting the nyancat pixel art wrong, and I got tired of pasting screenshots into Claude, so had it write a pixel-grid-to-image generator so it could iterate w/o my involvement. This didn't work well either (bad at visuals?) so I had ChatGPT convert the nyan into a pixel grid, and Opus decided to make it a PNG.
 
 ## Setup
 
