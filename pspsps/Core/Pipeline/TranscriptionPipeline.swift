@@ -1,4 +1,5 @@
 import AVFoundation
+import OSLog
 
 @MainActor
 final class TranscriptionPipeline {
@@ -7,6 +8,7 @@ final class TranscriptionPipeline {
     let postProcessor: any PostProcessor
     private let config: AppConfig
     private var currentTask: Task<String, Error>?
+    private static let logger = Logger(subsystem: "com.pspsps.pspsps", category: "Pipeline")
 
     init(
         asrEngine: any ASREngine,
@@ -28,6 +30,8 @@ final class TranscriptionPipeline {
         currentTask?.cancel()
 
         let task = Task { [asrEngine, postProcessor, config, buffer] in
+            let t0 = CFAbsoluteTimeGetCurrent()
+
             let normalized: AVAudioPCMBuffer
             if config.gainNormalizationEnabled {
                 normalized = AudioProcessor.normalizeRMS(buffer, targetDBFS: config.gainTargetDBFS)
@@ -37,7 +41,9 @@ final class TranscriptionPipeline {
 
             try Task.checkCancellation()
 
+            let t1 = CFAbsoluteTimeGetCurrent()
             let result = try await asrEngine.transcribe(audio: normalized)
+            let t2 = CFAbsoluteTimeGetCurrent()
 
             try Task.checkCancellation()
 
@@ -47,7 +53,12 @@ final class TranscriptionPipeline {
                 previousTranscript: nil,
                 timestamp: Date()
             )
-            return try await postProcessor.clean(transcript: result.text, context: context)
+            let cleaned = try await postProcessor.clean(transcript: result.text, context: context)
+            let t3 = CFAbsoluteTimeGetCurrent()
+
+            Self.logger.info("Pipeline: normalize=\(Int((t1-t0)*1000))ms asr=\(Int((t2-t1)*1000))ms post=\(Int((t3-t2)*1000))ms total=\(Int((t3-t0)*1000))ms")
+
+            return cleaned
         }
 
         currentTask = task
