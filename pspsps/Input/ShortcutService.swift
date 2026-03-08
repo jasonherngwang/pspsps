@@ -11,7 +11,8 @@ final class ShortcutService: ObservableObject {
         get { hotkeyManager.onHotkeyEvent }
         set { hotkeyManager.onHotkeyEvent = newValue }
     }
-    
+
+
     func startListening(config: AppConfig, onPermissionDenied: @escaping () -> Void) {
         do {
             try hotkeyManager.startListening(

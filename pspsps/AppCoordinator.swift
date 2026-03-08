@@ -1,7 +1,6 @@
 import AppKit
 import AVFoundation
 import Combine
-import CoreGraphics
 import OSLog
 
 /// Orchestrates the end-to-end voice-to-text flow.
@@ -75,6 +74,7 @@ final class AppCoordinator: ObservableObject {
         setupCallbacks()
         observeConfigChanges()
         if NSClassFromString("XCTestCase") == nil {
+            startHotkeyListening()
             Task { await self.startup() }
         }
     }
@@ -144,7 +144,6 @@ final class AppCoordinator: ObservableObject {
             logger.error("Model load failed: \(error)")
             modelNotLoaded = true
         }
-        startHotkeyListening()
     }
 
     private func startHotkeyListening() {
@@ -193,14 +192,16 @@ final class AppCoordinator: ObservableObject {
         let frontmost = NSWorkspace.shared.frontmostApplication
         capturedSourceApp = frontmost?.localizedName
         capturedSourceAppBundleID = frontmost?.bundleIdentifier
-        
+
         captureTask = Task {
             do {
                 // Start capture synchronously on a background thread
+                let captureStart = CFAbsoluteTimeGetCurrent()
                 try await Task.detached {
                     try self.audioService.startCaptureDirect()
                 }.value
-                
+                self.logger.info("Audio engine started in \(Int((CFAbsoluteTimeGetCurrent() - captureStart) * 1000))ms")
+
                 // Engine is now running. Did the user already release the key?
                 if self.pendingStop {
                     let buffer = self.audioService.stopCapture()
@@ -208,12 +209,12 @@ final class AppCoordinator: ObservableObject {
                     self.runTranscription(buffer: buffer)
                     return
                 }
-                
+
                 // Wait for the user to release the hotkey
                 await withCheckedContinuation { continuation in
                     self.stopContinuation = continuation
                 }
-                
+
                 // Stop capture and transcribe (engine is guaranteed running)
                 let buffer = self.audioService.stopCapture()
                 self.logger.info("stopCapture returned buffer with \(buffer.frameLength) frames")
@@ -231,13 +232,18 @@ final class AppCoordinator: ObservableObject {
     }
 
     private func handleHotkeyStopped() {
-        guard state == .recording else { return }
+        guard state == .recording else {
+            logger.debug("handleHotkeyStopped ignored — state is \(String(describing: self.state))")
+            return
+        }
         if let cont = stopContinuation {
             // Engine booted and Task is waiting — resume it
+            logger.info("handleHotkeyStopped: resuming capture continuation")
             stopContinuation = nil
             cont.resume()
         } else {
             // Engine still booting — mark for immediate stop after boot
+            logger.info("handleHotkeyStopped: setting pendingStop (engine still booting)")
             pendingStop = true
         }
     }
@@ -248,6 +254,7 @@ final class AppCoordinator: ObservableObject {
             return
         }
         state = .transcribing
+        logger.info("Transcribing \(buffer.frameLength) frames (\(String(format: "%.1f", Double(buffer.frameLength) / 16000))s audio)")
         Task {
             do {
                 let text = try await pipeline.run(

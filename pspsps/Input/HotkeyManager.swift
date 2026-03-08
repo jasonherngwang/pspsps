@@ -27,6 +27,12 @@ final class HotkeyManager: @unchecked Sendable {
     nonisolated(unsafe) private var eventTap: CFMachPort?
     nonisolated(unsafe) private var runLoopSource: CFRunLoopSource?
     nonisolated(unsafe) private var tapContext: TapContext?
+    /// Backup keyUp monitor — catches releases the CGEvent tap misses when
+    /// the system temporarily disables it (tapDisabledByTimeout).
+    /// When the tap is active it consumes matched events (returns nil),
+    /// so this monitor never fires in the normal case.
+    nonisolated(unsafe) private var globalKeyUpMonitor: Any?
+    nonisolated(unsafe) private var localKeyUpMonitor: Any?
 
     // MARK: - Public API
 
@@ -72,6 +78,28 @@ final class HotkeyManager: @unchecked Sendable {
         runLoopSource = source
         CFRunLoopAddSource(CFRunLoopGetMain(), source, .commonModes)
         CGEvent.tapEnable(tap: tap, enable: true)
+
+        // Backup keyUp monitors — when the CGEvent tap is disabled by the system,
+        // events pass through untouched. The global monitor catches keyUp going to
+        // other apps; the local monitor catches keyUp if our app happens to be frontmost
+        // (e.g. briefly during launch). handleHotkeyStopped() is idempotent so
+        // double-firing from tap + monitor is harmless.
+        if mode == .pushToTalk {
+            globalKeyUpMonitor = NSEvent.addGlobalMonitorForEvents(matching: .keyUp) { [weak self] nsEvent in
+                guard let self else { return }
+                guard nsEvent.keyCode == self.configKeyCode else { return }
+                logger.debug("Global monitor caught keyUp for hotkey")
+                self.onHotkeyEvent?(.stopped)
+            }
+            localKeyUpMonitor = NSEvent.addLocalMonitorForEvents(matching: .keyUp) { [weak self] nsEvent in
+                guard let self else { return nsEvent }
+                guard nsEvent.keyCode == self.configKeyCode else { return nsEvent }
+                logger.debug("Local monitor caught keyUp for hotkey")
+                self.onHotkeyEvent?(.stopped)
+                return nsEvent
+            }
+        }
+
         logger.notice("Hotkey listening started: keyCode=\(keyCode), modifiers=\(modifiers.rawValue)")
     }
 
@@ -85,6 +113,14 @@ final class HotkeyManager: @unchecked Sendable {
         eventTap = nil
         runLoopSource = nil
         tapContext = nil
+        if let monitor = globalKeyUpMonitor {
+            NSEvent.removeMonitor(monitor)
+            globalKeyUpMonitor = nil
+        }
+        if let monitor = localKeyUpMonitor {
+            NSEvent.removeMonitor(monitor)
+            localKeyUpMonitor = nil
+        }
     }
 
     // MARK: - CGEvent Handling (called directly from C callback, no actor context needed)
@@ -94,6 +130,7 @@ final class HotkeyManager: @unchecked Sendable {
         event: CGEvent
     ) -> Unmanaged<CGEvent>? {
         if type == .tapDisabledByTimeout || type == .tapDisabledByUserInput {
+            logger.warning("CGEvent tap was disabled (type=\(type.rawValue)), re-enabling")
             if let tap = eventTap {
                 CGEvent.tapEnable(tap: tap, enable: true)
             }
@@ -120,8 +157,10 @@ final class HotkeyManager: @unchecked Sendable {
         switch configMode {
         case .pushToTalk:
             if type == .keyDown && !isRepeat {
+                logger.debug("Tap: keyDown for hotkey")
                 onHotkeyEvent?(.started)
             } else if type == .keyUp {
+                logger.debug("Tap: keyUp for hotkey")
                 onHotkeyEvent?(.stopped)
             }
         case .toggle:
